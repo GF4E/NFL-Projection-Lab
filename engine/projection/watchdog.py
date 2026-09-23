@@ -125,6 +125,8 @@ def assess_host(snapshot, external, now):
         findings.append(issue('STORAGE_HEADROOM_UNQUALIFIED'))
     if snapshot.get('storage_measurement',{}).get('state')=='FAILED':
         findings.append(issue('STORAGE_MEASUREMENT_FAILED'))
+    if snapshot.get('prospective',{}).get('state') in ('DEGRADED','UNOBSERVED','UNVERIFIED'):
+        findings.append(issue('PROSPECTIVE_COLLECTOR_'+snapshot['prospective']['state']))
     capture = snapshot['services'].get('nfl-engine-capture.service', {})
     if snapshot['services'].get('nfl-engine-capture.timer', {}).get('ActiveState') != 'active':
         findings.append(issue('CAPTURE_TIMER_INACTIVE'))

@@ -160,6 +160,11 @@ def host_once(folder=HOST_STATE, root=ROOT, now=None, storage_history=None):
         value['cutoff_state']=cutoff_health(root,now)
     except (OSError,ValueError,KeyError,TypeError) as error:
         value['cutoff_state']={'state':'UNVERIFIED','error_type':type(error).__name__}
+    try:
+        from engine.projection.prospective_worker import health as prospective_health
+        value['prospective']=prospective_health(root)
+    except (OSError,ValueError,KeyError,TypeError) as error:
+        value['prospective']={'state':'UNVERIFIED','error_type':type(error).__name__}
     external = load(folder/'outside-receipt.json')
     now = now if fixed_time else dt.datetime.now(UTC)
     value['checked_at'] = now.isoformat()

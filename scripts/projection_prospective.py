@@ -9,11 +9,15 @@ def main():
     sub=parser.add_subparsers(dest='mode',required=True)
     q=sub.add_parser('enroll');q.add_argument('--schedule-ref',required=True,type=json.loads);q.add_argument('--season',required=True,type=int)
     q=sub.add_parser('pair');q.add_argument('--plan-ref',required=True,type=json.loads);q.add_argument('--card',required=True,type=Path);q.add_argument('--scorer-root',required=True,type=Path)
+    q=sub.add_parser('configure');q.add_argument('--plan-ref',required=True,type=json.loads);q.add_argument('--scorer-root',required=True,type=Path);q.add_argument('--owner',required=True)
     q=sub.add_parser('restore');q.add_argument('--plan-ref',required=True,type=json.loads);q.add_argument('--destination',required=True,type=Path)
     q=sub.add_parser('report');q.add_argument('--plan-ref',required=True,type=json.loads)
     a=parser.parse_args()
     if a.mode=='enroll':result=p.enroll(a.root,a.schedule_ref,a.season)
     elif a.mode=='pair':result=p.pair(a.root,a.plan_ref,json.loads(a.card.read_bytes()),a.scorer_root)
+    elif a.mode=='configure':
+        from engine.projection.prospective_worker import configure
+        result=configure(a.root,a.plan_ref,a.scorer_root,a.owner)
     elif a.mode=='restore':result=p.restore_scorer(a.root,a.plan_ref,a.destination)
     else:result=p.report(a.root,a.plan_ref)
     print(json.dumps(result,sort_keys=True))

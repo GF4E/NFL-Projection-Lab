@@ -1,0 +1,78 @@
+................EEE.E..E.s
+======================================================================
+ERROR: test_collector_pair_retry_and_configuration_changes (test_projection_prospective_worker.CollectorTests.test_collector_pair_retry_and_configuration_changes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective_worker.py", line 31, in test_collector_pair_retry_and_configuration_changes
+    first=w.worker(self.root,'owner',fd)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 146, in worker
+    **collect_one(root,config,card)})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 119, in collect_one
+    snapshot={k:card[k] for k in (*p.bundle.PROTECTED,*p.cutoff_publication.FIELDS,'status')}
+                ~~~~^^^
+KeyError: 'cutoff_forecast_ref'
+
+======================================================================
+ERROR: test_corrupt_committed_pair_does_not_report_success (test_projection_prospective_worker.CollectorTests.test_corrupt_committed_pair_does_not_report_success)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective_worker.py", line 55, in test_corrupt_committed_pair_does_not_report_success
+    r=w.collect_one(self.root,self.config,self.card);(self.root/r['pair_ref']['path']).write_text('{}')
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 119, in collect_one
+    snapshot={k:card[k] for k in (*p.bundle.PROTECTED,*p.cutoff_publication.FIELDS,'status')}
+                ~~~~^^^
+KeyError: 'cutoff_forecast_ref'
+
+======================================================================
+ERROR: test_interrupted_attempt_reconciles_pair_without_rescoring (test_projection_prospective_worker.CollectorTests.test_interrupted_attempt_reconciles_pair_without_rescoring)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective_worker.py", line 44, in test_interrupted_attempt_reconciles_pair_without_rescoring
+    with patch.object(w,'seal_attempt',side_effect=OSError('receipt failed')),self.assertRaises(OSError):w.collect_one(self.root,self.config,self.card)
+                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 119, in collect_one
+    snapshot={k:card[k] for k in (*p.bundle.PROTECTED,*p.cutoff_publication.FIELDS,'status')}
+                ~~~~^^^
+KeyError: 'cutoff_forecast_ref'
+
+======================================================================
+ERROR: test_owner_and_unrelated_descriptor_refused (test_projection_prospective_worker.CollectorTests.test_owner_and_unrelated_descriptor_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective_worker.py", line 26, in test_owner_and_unrelated_descriptor_refused
+    with (self.root/'other-lock').open('w+') as fd,self.assertRaises(ValueError):w.collect(self.root,'owner',fd)
+                                                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 72, in collect
+    check_owner(root,owner,handle)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 53, in check_owner
+    with pipeline_release.dispatch(root,handle):
+  File "/opt/anaconda3/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/pipeline_release.py", line 192, in dispatch
+    actual=os.fstat(handle.fileno());expected=path.stat()
+                                              ^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 840, in stat
+    return os.stat(self, follow_symlinks=follow_symlinks)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/var/folders/_w/qdm05hdd4bd6jn63np8pcfrw0000gn/T/tmph06mbrpl/outputs/model-pick-v1/.cloud-dispatch.lock'
+
+======================================================================
+ERROR: test_timeout_is_bounded_to_three_and_integrity_failure_latches (test_projection_prospective_worker.CollectorTests.test_timeout_is_bounded_to_three_and_integrity_failure_latches)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective_worker.py", line 50, in test_timeout_is_bounded_to_three_and_integrity_failure_latches
+    for _ in range(3):self.assertEqual(w.collect_one(self.root,self.config,self.card)['state'],'INTERRUPTED')
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective_worker.py", line 119, in collect_one
+    snapshot={k:card[k] for k in (*p.bundle.PROTECTED,*p.cutoff_publication.FIELDS,'status')}
+                ~~~~^^^
+KeyError: 'cutoff_forecast_ref'
+
+----------------------------------------------------------------------
+Ran 26 tests in 3.324s
+
+FAILED (errors=5, skipped=1)

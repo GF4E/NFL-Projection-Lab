@@ -22,6 +22,8 @@ PROTECTED = ('game_id','season','week','home','away','kickoff_at','cutoff_at','v
              'issued_at','evidence','projection','contributions','why','personnel','forecast',
              'fit_artifact_ref','fit_sha256','calibration_ref','probability_semantics')
 CODE_PATHS = (
+    'engine/projection/prospective.py','engine/projection/prospective_worker.py','engine/projection/research_ledger.py',
+    'scripts/projection_prospective_collect.py',
     'engine/projection/initial_release.py','engine/projection/release_preflight.py','scripts/projection_initial_release.py',
     'engine/projection/runtime_snapshot.py','engine/projection/executable.py',
     'engine/projection/pipeline_release.py','scripts/cloud_scheduler.py',

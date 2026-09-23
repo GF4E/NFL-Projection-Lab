@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('work/projection-weekly-refit-v1/', 'work/projection-cutoff-pipeline-v1/', 'work/projection-cutoff-state-v1/', 'work/projection-observations-v1/', 'outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('work/projection-prospective-v1/', 'work/projection-research-ledger-v1/', 'work/projection-weekly-refit-v1/', 'work/projection-cutoff-pipeline-v1/', 'work/projection-cutoff-state-v1/', 'work/projection-observations-v1/', 'outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -244,6 +244,15 @@ def run(mode, host):
             else:
                 from scripts.projection_publish import run as publish_projection
             publish_projection(require_synced_entries=True)
+            if mode=='capture':
+                from engine.projection.prospective_worker import collect
+                try:collect(ROOT,host,handle)
+                except Exception as error:
+                    # Shadow failure never prevents the primary lock/publication.
+                    from engine.projection.prospective_worker import status
+                    try:status(ROOT,{'state':'DEGRADED','reason':'COLLECTOR_FAILED','error_type':type(error).__name__,'activates_method':False})
+                    except (OSError,ValueError):
+                        print(json.dumps({'state':'PROSPECTIVE_RECEIPT_FAILED','error_type':type(error).__name__}),flush=True)
             from scripts.projection_learning import report,run_weekly
             report()
             if mode=='daily' and entries_synced:
