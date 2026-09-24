@@ -1,0 +1,116 @@
+{
+  "after": "E-PFF",
+  "calibration_thresholds": [
+    17.5,
+    20.5,
+    23.5,
+    27.5,
+    30.5
+  ],
+  "candidates": {
+    "a": "drive_simulation_team_points",
+    "b": "a_plus_questionable_starter_backup_mixture",
+    "c": "authoritative_deployed_control"
+  },
+  "clock": {
+    "deadline": "following Tuesday 06:00 America/Los_Angeles",
+    "maximum_queue_blocks": 1,
+    "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_PREDECESSORS_AND_PUBLISHED_CLOSEOUT"
+  },
+  "control": {
+    "generated_at": null,
+    "path": null,
+    "sha256": null,
+    "status": "RESOLVE_AND_VERIFY_AUTHORITATIVE_DEPLOYED_LINEAGE_AT_ACTIVATION"
+  },
+  "files": {
+    "FINDINGS.md": "a641975891e21384ac58fb01e533b4ceadc26fb78664df1f107158dea66d6337",
+    "work/e-mc/PLAN.md": "20582c395d52d8f670a2fdb461231e5596853a4ed74e881a2ddfd2de60207131",
+    "work/e-unc/registration.json": "cc426270c4270bc5343f9d00628d538db2c7b0eb88afcfb867c7eb3f500a20e1",
+    "work/e-unc/variance.json": "fe0bc8695efc42a5fc7d0faeedbf87467bf435d9d4c0996980c3cbbf3ae726e5",
+    "work/engine-rebuild/MEAN-CONTRACT.md": "ae8e5793855ecfb66304b8234576cb3158a3824817ac66cd1863cf3389de5ab9"
+  },
+  "fit_started": false,
+  "floor": {
+    "fixed_inputs": true,
+    "model_dependent": true,
+    "season_convergence_chart": "DEFERRED_UNTIL_VERIFIED_E_MC_EVIDENCE",
+    "statistic": "conditional_team_points_SD"
+  },
+  "gap_sweep": "work/e-mc/PLAN.md",
+  "gate": {
+    "absolute_coverage_tolerance": 0.03,
+    "inherited_gate_scope": "B04_PENDING",
+    "market_relative_selection": false,
+    "point_forecast_absolute_tolerance": 1e-12,
+    "point_targets": [
+      "team_points",
+      "margin",
+      "total"
+    ],
+    "primary": "mean_team_points_CRPS",
+    "relative_improvement_min": 0.01,
+    "team_coverage_levels": [
+      0.5,
+      0.8
+    ]
+  },
+  "id": "E-MC",
+  "population": {
+    "drop_missing": false,
+    "games": 2639,
+    "resolve_game_ids_before_activation": true,
+    "seasons": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "predecessor_reports": {
+    "E-GROUPS": null,
+    "E-PFF": null
+  },
+  "promotion": false,
+  "purpose": "predictive team-score distribution shape; not width compression",
+  "registered_at": "2026-09-24T21:59:51.507989+00:00",
+  "requires_reported": [
+    "E-GROUPS",
+    "E-PFF"
+  ],
+  "results_viewed": false,
+  "review_requested": [
+    "C05",
+    "C06"
+  ],
+  "schema": "queued-experiment-registration-v1",
+  "simulation": {
+    "drive_outcomes": [
+      "touchdown",
+      "field_goal",
+      "safety",
+      "no_score"
+    ],
+    "exact_integer_mean_definition": "B01_PENDING",
+    "mean_target": "deployed_team_point_projection",
+    "members_per_game": 10000,
+    "rates": "opponent_adjusted_per_drive",
+    "seed_stored": true,
+    "team_drive_count": "team_pace_distribution"
+  },
+  "simulation_started": false,
+  "source_commit": "28312207fa6682b6994ab9c9b92c835edb47c933",
+  "state": "REGISTERED_PENDING_PREDECESSOR_REPORTS_AND_EXECUTABLE_DEFINITIONS",
+  "tier3": [
+    "B01",
+    "B02",
+    "B03",
+    "B04"
+  ]
+}

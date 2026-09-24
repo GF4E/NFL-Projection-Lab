@@ -369,6 +369,30 @@
       "name": "forecast blending and scheduled EMOS refit",
       "state": "QUEUED",
       "week": 9
+    },
+    {
+      "after": "E-PFF",
+      "blockers": [
+        "Predecessor reports not yet located/verified",
+        "Executable gap sweep B01\u2013B04 unresolved; see registration"
+      ],
+      "clock": {
+        "deadline": "following Tuesday 06:00 America/Los_Angeles",
+        "maximum_queue_blocks": 1,
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_PREDECESSORS_AND_PUBLISHED_CLOSEOUT"
+      },
+      "fit_started": false,
+      "id": "E-MC",
+      "production_activated": false,
+      "promoted": false,
+      "registration": "work/e-mc/registration.json",
+      "registration_sha256": "aaa01fb489ca8b6054bffa03ecbc1e8ed07f13813f97548037631db15b7a860c",
+      "requires_reported": [
+        "E-GROUPS",
+        "E-PFF"
+      ],
+      "simulation_started": false,
+      "state": "REGISTERED_PENDING_PREDECESSOR_REPORTS_AND_EXECUTABLE_DEFINITIONS"
     }
   ],
   "governance_sha256": "77b4d4f2663084b6c034c3a740645ec74de0729d975a9dfcb41fea3ede562e67",
@@ -381,6 +405,22 @@
   ],
   "next_experiment": "E-CAL-LINEAGE",
   "one_experiment_per_week": true,
+  "precedence_constraints": [
+    {
+      "authority": "Gabe request 2026-09-24",
+      "missing_predecessor_records": [
+        "E-GROUPS",
+        "E-PFF"
+      ],
+      "registration": "work/e-mc/registration.json",
+      "sequence": [
+        "E-GROUPS",
+        "E-PFF",
+        "E-MC"
+      ],
+      "status": "ENFORCE_BEFORE_E_MC_ACTIVATION"
+    }
+  ],
   "prerequisites": {
     "E1_candidate_count": "Resolved: unchanged linear control is outside cap; three challengers k4,k8,state-space.",
     "staff_history": "PARTIAL: 446/448 Week 1 QB1 IDs; coaching rows unknown after PFR 403. A.3 explicitly authorizes false unknown transition flags, reported.",
