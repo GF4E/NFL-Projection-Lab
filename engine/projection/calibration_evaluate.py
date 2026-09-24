@@ -10,7 +10,8 @@ import numpy as np
 
 from engine import scoring
 from engine.forecast_system.calendar import timestamp
-from engine.projection_experiments import _calibration_reasons, digest, POINT_TOLERANCE
+from engine.projection_experiments import _calibration_reasons, POINT_TOLERANCE
+from .calibration_json import digest
 from engine.projection_v3.qualify import block_interval
 from . import calibration_admission as admission, calibration_history as history
 from .distribution import pmf
@@ -191,8 +192,10 @@ def run(root,registration_ref,*,clock=lambda:dt.datetime.now(dt.timezone.utc)):
     def checkpoint():
         if time.monotonic()-started>=2700:raise TimeoutError('45 minute calibration deadline')
     result=numerical(checked,weeks,checkpoint=checkpoint)
+    prerequisites=checked['prerequisites']
+    del checked, schedule
     # Re-read hashes, authority and current clock after computation, before return.
     finished=clock();admission.preflight(root,registration_ref,at=finished)
     result.update(started_at=before.isoformat(),completed_at=finished.isoformat(),
-                  elapsed_seconds=time.monotonic()-started,prerequisites=checked['prerequisites'])
+                  elapsed_seconds=time.monotonic()-started,prerequisites=prerequisites)
     return {**result,'sha256':digest(result)}

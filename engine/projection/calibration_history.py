@@ -8,7 +8,7 @@ import copy
 import datetime as dt
 import math
 import re
-from .model import hash_value
+from .calibration_json import digest as hash_value
 from .distribution import residual_distribution, pmf, quantile, summarize
 from engine.forecast_system.calendar import timestamp
 
@@ -54,6 +54,7 @@ def build(history, fits, *, expected_game_ids, donor_method_sha256, point_method
     selected = []
     seen = set()
     used_fits = {}
+    fit_checks = {}
     for row in history:
         if type(row.get('season')) is not int:
             raise ValueError('Invalid donor season')
@@ -67,18 +68,24 @@ def build(history, fits, *, expected_game_ids, donor_method_sha256, point_method
         if label_at < issue + dt.timedelta(minutes=75, hours=4) or label_at >= at:
             raise ValueError('Outcome unavailable at calibration fitting')
         fit_hash = digest(row['fit_evidence_sha256'])
-        manifest = fits.get(fit_hash)
-        if not manifest or set(manifest) != FIT_KEYS or hash_value(manifest) != fit_hash:
-            raise ValueError('Missing or mismatched donor fit manifest')
-        if manifest['method_sha256'] != donor_method_sha256:
-            raise ValueError('Donor method mismatch')
-        fit_at = timestamp(manifest['available_at'])
-        if fit_at >= issue or timestamp(manifest['last_label_available_at']) >= fit_at:
+        if fit_hash not in used_fits:
+            manifest = fits.get(fit_hash)
+            if not manifest or set(manifest) != FIT_KEYS or hash_value(manifest) != fit_hash:
+                raise ValueError('Missing or mismatched donor fit manifest')
+            if manifest['method_sha256'] != donor_method_sha256:
+                raise ValueError('Donor method mismatch')
+            fit_at = timestamp(manifest['available_at'])
+            last_label = timestamp(manifest['last_label_available_at'])
+            training = manifest['training_game_ids']
+            if (not isinstance(training, list) or len(set(training)) != len(training)
+                    or any(not isinstance(g, str) or not g for g in training)):
+                raise ValueError('Invalid/self-trained donor population')
+            used_fits[fit_hash] = copy.deepcopy(manifest)
+            fit_checks[fit_hash] = (fit_at, last_label, set(training))
+        fit_at, last_label, training = fit_checks[fit_hash]
+        if fit_at >= issue or last_label >= fit_at:
             raise ValueError('Donor fit unavailable at issuance')
-        training = manifest['training_game_ids']
-        if (not isinstance(training, list) or len(set(training)) != len(training)
-                or any(not isinstance(g, str) or not g for g in training)
-                or row['game_id'] in training):
+        if row['game_id'] in training:
             raise ValueError('Invalid/self-trained donor population')
         for side in ('home', 'away'):
             finite(row[side])
@@ -86,7 +93,6 @@ def build(history, fits, *, expected_game_ids, donor_method_sha256, point_method
             if actual < 0 or actual != int(actual):
                 raise ValueError('Actual team scores must be nonnegative integers')
         selected.append(copy.deepcopy(row))
-        used_fits[fit_hash] = copy.deepcopy(manifest)
     if sorted(seen) != expected:
         raise ValueError('Calibration population mismatch; no games dropped')
     selected.sort(key=lambda r: r['game_id'])

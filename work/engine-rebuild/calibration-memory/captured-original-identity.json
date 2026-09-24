@@ -1,0 +1,76 @@
+{
+  "scope": "SYNTHETIC_ONLY_NOT_AN_EXPERIMENT",
+  "fixture_root": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/.cloud-private/calibration-memory/captured-original/tmp38j5qala",
+  "registration": {
+    "path": "work/registration.json",
+    "sha256": "610c6c8d64f3f8523946b1e32522897eb7948cf5d2818940941f483f1de38f63"
+  },
+  "input_ref": {
+    "path": "work/inputs.json",
+    "sha256": "582ec3708c2496b9f8fffb17a9ad22f957928b76e3c36093d6ab3e73e0ec1873"
+  },
+  "same_input_hash_as_failed_linux_run": true,
+  "environment": {
+    "python": "3.12.2",
+    "numpy": "1.26.4",
+    "scoringrules": "0.10.0"
+  },
+  "code": [
+    {
+      "path": "engine/projection/calibration_admission.py",
+      "sha256": "dd3c81965ba11bd2b882e19f399ec925504388994ae268be8f50289575c20759"
+    },
+    {
+      "path": "engine/projection/calibration_evaluate.py",
+      "sha256": "489fe4473c0aaf78dfbaf38c989b846e7478fd3eeee2c7e4efaf887677cc0409"
+    },
+    {
+      "path": "engine/projection/calibration_history.py",
+      "sha256": "35b8090f3203759426b26045aebab8087f9cd8e88378af9f0be17816dc6cfe41"
+    },
+    {
+      "path": "engine/projection/distribution.py",
+      "sha256": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec"
+    },
+    {
+      "path": "engine/projection/model.py",
+      "sha256": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead"
+    },
+    {
+      "path": "engine/scoring.py",
+      "sha256": "288bd49f4d44893023a5b1667c92004ff99f7ada28bc336be45ba7a1093565dd"
+    },
+    {
+      "path": "engine/projection_v3/qualify.py",
+      "sha256": "ea0d7385dbb97a3730b3a6c3e0d62041b157a1c19155ab96585eb1b11a7a58d2"
+    },
+    {
+      "path": "engine/projection_experiments.py",
+      "sha256": "869044f2abaf079a9f317a25fdb6e69fd61b037ffddca3a6ecea2fd1b7a3c8f3"
+    },
+    {
+      "path": "engine/forecast_system/calendar.py",
+      "sha256": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b"
+    },
+    {
+      "path": "engine/projection/calibration_execute.py",
+      "sha256": "51557cc34dd347ae7abaae5d5f0dd647bbb58970a97f714bd6457dbb692d02e4"
+    },
+    {
+      "path": "engine/projection/storage.py",
+      "sha256": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f"
+    },
+    {
+      "path": "scripts/projection_calibration.py",
+      "sha256": "440266722826de4a23c3094db34466546ebb59d7f4c8d249840c3cb8ec1ba805"
+    },
+    {
+      "path": "engine/projection/research_ledger.py",
+      "sha256": "ea1310c5da238315ff755083b0acb99187fb879f28a0a4cba13de3598e406a8c"
+    },
+    {
+      "path": "engine/projection/calibration_report.py",
+      "sha256": "f841f02c941f73b68f379301bb719a9bee0640c74393f3bae76ed506f5c9e213"
+    }
+  ]
+}

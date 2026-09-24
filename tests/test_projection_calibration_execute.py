@@ -104,12 +104,13 @@ class ExecutionTests(Base):
                 # Each subcase needs a separate accepted registration identity.
                 self.r['disproving_conditions']='registered gate failure '+target
                 self.ref=self.registration();self.key=a.read(self.root,self.ref)['sha256']
-                real=storage.save
+                owner=x.retained_json if target=='result.json' else storage
+                real=owner.save
                 def uncertain(path,value,**kwargs):
                     outcome=real(path,value,**kwargs)
                     if path.name==target:raise OSError('uncertain fsync')
                     return outcome
-                with patch.object(storage,'save',side_effect=uncertain),self.assertRaises(OSError):self.execute()
+                with patch.object(owner,'save',side_effect=uncertain),self.assertRaises(OSError):self.execute()
                 with patch.object(evaluator,'run') as worker:
                     done=self.execute();worker.assert_not_called()
                 self.assertEqual(len(done['attempts']),1)
@@ -124,12 +125,22 @@ class ExecutionTests(Base):
         worker.assert_not_called()
         with self.assertRaises(ValueError):report.publish(self.root,self.key)
 
+    def test_result_changed_during_streamed_read_is_rejected(self):
+        self.execute()
+        real=x.retained_json.load
+        def changed(path):
+            value=real(path)
+            path.write_bytes(path.read_bytes()+b' ')
+            return value
+        with patch.object(x.retained_json,'load',side_effect=changed),self.assertRaisesRegex(ValueError,'changed during read'):
+            x.read(self.root,self.key)
+
     def test_full_disk_cannot_create_false_success(self):
         real=storage.save
         def fail(path,value,**kwargs):
             if path.name in ('result.json','receipt.json'):raise OSError('disk full')
             return real(path,value,**kwargs)
-        with patch.object(storage,'save',side_effect=fail),self.assertRaises(OSError):self.execute()
+        with patch.object(storage,'save',side_effect=fail),patch.object(x.retained_json,'save',side_effect=OSError('disk full')),self.assertRaises(OSError):self.execute()
         saved=x.read(self.root,self.key)
         self.assertIsNone(saved['attempts'][0]['receipt']);self.assertIsNone(saved['attempts'][0]['result'])
         with patch.object(evaluator,'run') as worker:

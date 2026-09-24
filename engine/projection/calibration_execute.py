@@ -8,7 +8,8 @@ import re
 import socket
 from pathlib import Path
 from engine.forecast_system.calendar import timestamp
-from engine.projection_experiments import digest
+from .calibration_json import digest
+from . import calibration_json as retained_json
 from . import calibration_admission as admission, calibration_evaluate as evaluator, storage
 
 BASE='work/e-cal-lineage/executions'
@@ -43,7 +44,7 @@ def read_envelope(path):
 
 def ref(root,path):
     return {'path':str(path.relative_to(Path(root).resolve())),
-            'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
+            'sha256':retained_json.file_digest(path)}
 
 
 def verify_result(value,request):
@@ -89,7 +90,9 @@ def read(root,key):
         if (path/'result.json').exists():
             if not intent or ref(root,path/'result.json')['sha256']!=intent['result_file_sha256']:
                 raise ValueError('Retained result differs from durable result intent')
-            record['result']=verify_result(json.loads((path/'result.json').read_bytes()),request)
+            record['result']=verify_result(retained_json.load(path/'result.json'),request)
+            if ref(root,path/'result.json')['sha256']!=intent['result_file_sha256']:
+                raise ValueError('Retained result changed during read')
             if timestamp(record['result']['started_at'])<timestamp(start['started_at']):raise ValueError('Result predates attempt')
         if (path/'receipt.json').exists():
             receipt=read_envelope(path/'receipt.json')
@@ -97,8 +100,7 @@ def read(root,key):
             lower=(record['result'] or {}).get('completed_at',start['started_at'])
             if timestamp(receipt['recorded_at'])<timestamp(lower):raise ValueError('Receipt clock predates evidence')
             if receipt['state']=='COMPUTED_NOT_RELEASED':
-                value=admission.read(root,receipt['result_ref'])
-                if value!=record['result'] or receipt['result_ref']!=ref(root,path/'result.json'):
+                if record['result'] is None or receipt['result_ref']!=ref(root,path/'result.json'):
                     raise ValueError('Committed result differs')
             elif receipt['state'] not in ('FAILED','INTERRUPTED','OUT_OF_SCOPE') or record['result'] is not None:
                 raise ValueError('Unexpected attempt disposition')
@@ -135,7 +137,7 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
             if receipt is None:
                 if previous['result'] is not None:
                     # Same payload completes any ambiguous result-directory sync.
-                    storage.save(path/'result.json',previous['result'],immutable=True)
+                    retained_json.save(path/'result.json',previous['result'],immutable=True)
                     receipt={'schema':'calibration-attempt-receipt-v1','attempt':start['attempt'],
                         'start_sha256':digest(start),'state':'COMPUTED_NOT_RELEASED',
                         'result_ref':ref(root,path/'result.json'),'recorded_at':clock().isoformat(),
@@ -152,7 +154,9 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
                 if timestamp(receipt['recorded_at'])<timestamp((previous['result'] or {}).get('completed_at',start['started_at'])):
                     raise ValueError('Receipt clock predates evidence')
                 storage.save(path/'receipt.json',seal(receipt),immutable=True)
-            if receipt['state']=='COMPUTED_NOT_RELEASED' or not retry:return read(root,key)
+            if receipt['state']=='COMPUTED_NOT_RELEASED' or not retry:
+                previous['receipt']=receipt
+                return existing
             if len(attempts)>=MAX_ATTEMPTS:raise ValueError('Explicit attempt limit reached')
         # Fresh admission is required for every new computation, including retry.
         admitted=admission.preflight(root,registration_ref,at=clock())
@@ -162,15 +166,15 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
                'started_at':clock().isoformat(),'pid':os.getpid(),'hostname':socket.gethostname(),
                'prerequisites':admitted['prerequisites'],'activates_method':False}
         storage.save(path/'start.json',seal(start),immutable=True)
+        del admitted
         try:
             value=verify_result(evaluator.run(root,registration_ref,clock=clock),request)
             if timestamp(value['started_at'])<timestamp(start['started_at']):raise ValueError('Result predates attempt')
             admission.preflight(root,registration_ref,at=clock())
-            raw=(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)+'\n').encode()
             intent={'schema':'calibration-result-intent-v1','attempt':number,'start_sha256':digest(start),
-                    'result_file_sha256':hashlib.sha256(raw).hexdigest()}
+                    'result_file_sha256':retained_json.digest(value,newline=True)}
             storage.save(path/'result-intent.json',seal(intent),immutable=True)
-            storage.save(path/'result.json',value,immutable=True)
+            retained_json.save(path/'result.json',value,immutable=True)
         except Exception as error:
             if (path/'result.json').exists():
                 # Do not turn an uncertain durable result into a false failure.
@@ -186,4 +190,5 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
             'recorded_at':clock().isoformat(),'recovered_after_lost_response':False,'activates_method':False}
         if timestamp(receipt['recorded_at'])<timestamp(value['completed_at']):raise ValueError('Receipt clock predates evidence')
         storage.save(path/'receipt.json',seal(receipt),immutable=True)
+        del value
         return read(root,key)

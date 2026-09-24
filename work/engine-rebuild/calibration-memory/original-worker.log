@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/diagnose_calibration_memory.py", line 151, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/diagnose_calibration_memory.py", line 115, in main
+    return worker(output)
+           ^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/diagnose_calibration_memory.py", line 52, in worker
+    assert fixture.r['inputs']['sha256'] == host['identity']['input_ref']['sha256']
+AssertionError

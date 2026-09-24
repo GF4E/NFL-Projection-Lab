@@ -1,5 +1,6 @@
 """SYNTHETIC_ONLY_NOT_AN_EXPERIMENT: full-size retained runner resource probe."""
 import datetime as dt
+import gc
 import hashlib
 import importlib.util
 import json
@@ -134,6 +135,7 @@ def main(source, output):
     from engine.projection import calibration_execute as execution
     from engine.projection import calibration_report as report
     from engine.projection import research_ledger as ledger, storage
+    from engine.projection import calibration_json as retained_json
     started = time.monotonic()
     fixture = AdmissionTests()
     fixture.setUp()
@@ -160,6 +162,11 @@ def main(source, output):
         'synthetic_receipts': True, 'real_experiment_registered': False,
         'production_evidence_read_forbidden': True, 'activates_method': False}
     (output/'identity.json').write_text(json.dumps(identity, indent=2)+'\n')
+    root = fixture.root
+    # A real CLI worker reads prepared artifacts; it does not retain the fixture
+    # builder's second copy of every training row throughout execution.
+    del fixture, roles, folds, control, weeks
+    gc.collect()
     observer = Observer(output)
     original_write = storage.write_bytes
     def guarded_write(path, raw, immutable=False):
@@ -176,27 +183,40 @@ def main(source, output):
             observer.sample()
             return operation(src, dst, *args, **kwargs)
         return call
+    original_json_save = retained_json.save
+    def guarded_json_save(path, value, **kwargs):
+        if not Path(path).resolve().is_relative_to(output):
+            raise PermissionError('Write outside isolated attempt')
+        projected = sum(len(block) for block in retained_json.chunks(value, newline=True))
+        used = observer.sample()
+        reserve = os.statvfs(output)
+        if used+projected > CAP or reserve.f_bavail*reserve.f_frsize-projected < RESERVE:
+            raise RuntimeError('Synthetic storage guard: workspace cap or volume reserve')
+        return original_json_save(path, value, **kwargs)
     state = 'FAILED'
     phases = {}
     error = None
     try:
         with patch.object(storage, 'write_bytes', side_effect=guarded_write), \
+             patch.object(retained_json, 'save', side_effect=guarded_json_save), \
              patch.object(storage.os, 'replace', side_effect=watched(storage.os.replace)), \
              patch.object(storage.os, 'link', side_effect=watched(storage.os.link)):
             began = time.monotonic()
-            saved = ledger.run_calibration(fixture.root, registration)
+            saved = ledger.run_calibration(root, registration)
             phases['execute_and_ledger'] = time.monotonic()-began
             assert len(saved['attempts']) == 1
             assert saved['attempts'][0]['receipt']['state'] == 'COMPUTED_NOT_RELEASED'
             key = saved['key']
+            del saved
             began = time.monotonic()
-            retry = ledger.run_calibration(fixture.root, registration)
+            retry = ledger.run_calibration(root, registration)
             assert len(retry['attempts']) == 1
+            del retry
             phases['exact_retry'] = time.monotonic()-began
             began = time.monotonic()
-            published = report.publish(fixture.root, key)
+            published = report.publish(root, key)
             phases['retained_report'] = time.monotonic()-began
-            result = execution.read(fixture.root, key)['attempts'][0]['result']
+            result = execution.read(root, key)['attempts'][0]['result']
             assert len(result['records']) == 2639 and result['pooled']['control']['team']['n'] == 5278
             assert result['pooled']['control']['team']['mae'] == result['pooled']['candidate']['team']['mae']
             assert not result['activates_method']
