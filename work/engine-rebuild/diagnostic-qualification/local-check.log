@@ -1,0 +1,62 @@
+{
+  "status": "PASS",
+  "first_grades": 30,
+  "team_rows": 60,
+  "independent_bucket_metric_checks": 122,
+  "maximum_absolute_difference": 1.3322676295501878e-15,
+  "populations": {
+    "AS_ISSUED": {
+      "graded_games": 30,
+      "pending": 16,
+      "unverified_final": 0,
+      "buckets": 61,
+      "flags": 9,
+      "input_coverage": {
+        "divisional": {
+          "INSUFFICIENT": 24,
+          "ORIGINAL_ACTIVE_FIELD": 36
+        },
+        "dome": {
+          "INSUFFICIENT": 32,
+          "ORIGINAL_EXPLICIT_ROOF": 28
+        },
+        "elo_difference": {
+          "INSUFFICIENT": 8,
+          "ORIGINAL_ACTIVE_CONTRIBUTION": 16,
+          "ORIGINAL_ACTIVE_FIELD": 36
+        },
+        "luck_index": {
+          "INSUFFICIENT": 24,
+          "ORIGINAL_ACTIVE_FIELD": 36
+        },
+        "momentum": {
+          "INSUFFICIENT": 24,
+          "ORIGINAL_ACTIVE_FIELD": 36
+        },
+        "rest_days": {
+          "INSUFFICIENT": 24,
+          "ORIGINAL_ACTIVE_FIELD": 36
+        },
+        "wind": {
+          "INSUFFICIENT": 24,
+          "ORIGINAL_PRELOCK_FORECAST": 36
+        }
+      }
+    },
+    "RETROSPECTIVE": {
+      "graded_games": 0,
+      "pending": 0,
+      "unverified_final": 2,
+      "buckets": 0,
+      "flags": 0,
+      "input_coverage": {}
+    }
+  },
+  "original_records_and_pointer_unchanged": 53,
+  "row_order_invariant": true,
+  "edit_rows": 0,
+  "edit_evidence": "No local real edit observations; chronology behavior is fixture-verified",
+  "report_sha256": "a7171ea8fc6894f613e75ca8d6633b7d42f71147519e824ffa0552d8d6f71e0b",
+  "scope": "Report-only first-grade diagnostic qualification, no fit or gate",
+  "provider_requests": 0
+}

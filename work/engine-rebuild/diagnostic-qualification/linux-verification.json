@@ -1,0 +1,24 @@
+{
+  "status": "VERIFIED",
+  "invocation_id": "2d5cd3dfb0a9444a9e3b9ea525c68d88",
+  "diagnostic_sections_equal": [
+    "populations",
+    "learning",
+    "forecast_diagnostics",
+    "review_requested"
+  ],
+  "protected_records_unchanged": 53,
+  "terminal_start": {
+    "MESSAGE": "Started nfl-qualified-diagnostics.service - /usr/bin/flock -w 60 /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/.cloud-dispatch.lock /opt/nfl-runtime/env/bin/python -B /mnt/nfl-engine-profiles/qualified-diagnostics-canary/run.py /mnt/nfl-engine-profiles/qualified-diagnostics-canary.",
+    "__REALTIME_TIMESTAMP": "1790211073565284",
+    "__MONOTONIC_TIMESTAMP": "1062085329390"
+  },
+  "terminal_success": {
+    "MESSAGE": "nfl-qualified-diagnostics.service: Deactivated successfully.",
+    "__REALTIME_TIMESTAMP": "1790211096154100",
+    "__MONOTONIC_TIMESTAMP": "1062107918207"
+  },
+  "service_elapsed_seconds": 22.588817,
+  "host_report_sha256": "71c25ec50fb4962ea900b930511437f83c5cbc90a2a4eafd966542ab96a9b991",
+  "scope": "Staged source and captured report parity; not live publication or new source-recovery acceptance"
+}

@@ -175,7 +175,8 @@ def build(root, cards):
         result['lock_evidence'] = 'NOT_RECORDED_SEPARATELY'
         if lock.exists():
             lock_raw = lock.read_bytes(); locked = json.loads(lock_raw)
-            for field in ('game_id', 'version', 'projection', 'fit_sha256', 'calibration_ref', 'forecast_bundle_ref'):
+            for field in ('game_id', 'version', 'projection', 'fit_sha256', 'calibration_ref', 'forecast_bundle_ref',
+                          'learning_features', 'contributions', 'cutoff_at'):
                 if locked.get(field) != first.get(field): raise ValueError('Original lock/first-grade forecast differs')
             result['lock_evidence'] = {'path': str(lock.relative_to(root)), 'sha256': sha(lock_raw)}
         records.append(result)
@@ -209,6 +210,27 @@ def build(root, cards):
                 'negative_support': 'Measured without truncation; negative team/total score mass is an unresolved legacy limitation',
                 'uncertainty': {'method': 'Percentile paired-game bootstrap, both teams together', 'replicates': REPLICATES, 'seed': SEED,
                     'review_requested': 'Tier 2: game resampling ignores cross-game dependence; alternative week blocks is not qualified by two weeks. Descriptive only, no decision or gate.'}}}
+
+
+def original_cards(root, cards, report):
+    """Resolve already-validated first grades for all report consumers."""
+    import copy
+    root = Path(root); records = {r['game_id']: r for r in report['records']}; result = []
+    for card in sorted(cards, key=lambda c: c['game_id']):
+        gid = card['game_id']
+        if gid in records:
+            ref = records[gid]['first_grade_ref']
+            if not re.fullmatch(r'[A-Za-z0-9_]+', gid) or ref['path'] != f'outputs/projection-v3/grades/{gid}.json':
+                raise ValueError('Unapproved first-grade path')
+            raw = (root / ref['path']).read_bytes()
+            if sha(raw) != ref['sha256']: raise ValueError('First grade changed during reporting')
+            result.append(json.loads(raw))
+        else:
+            pending = copy.deepcopy(card)
+            pending['_diagnostic_shortfall'] = 'Immutable original first-grade record' if card.get('grades') else None
+            pending['grades'] = None
+            result.append(pending)
+    return result
 
 
 def markdown(report):

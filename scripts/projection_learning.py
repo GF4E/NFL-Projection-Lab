@@ -64,11 +64,18 @@ def trajectories(rows):
  return history
 
 def report():
- initialize();board=json.loads((ROOT/'outputs/projection-v3/board.json').read_text());cache=ROOT/'.cloud-private/projection-entries.json';entries=json.loads(cache.read_text()) if cache.exists() else {};b=build_report(board['games'],json.loads((WORK/'reference.json').read_text()),entries.get('history',[]));by={c['game_id']:c for c in board['games']};ledger=[{**e,'actual':by.get(e.get('game_id'),{}).get('grades',{}).get('PROJECTION',{}).get('actual') if by.get(e.get('game_id'),{}).get('grades') else None} for e in entries.get('history',[])];save(OUT/'edit-history.json',ledger);b['board_sha256']=board['content_sha256'];b['published_at']=board['published_at'];
+ # Missing reference evidence is an initialization dependency, never report-time fitting.
+ reference=json.loads((WORK/'reference.json').read_text())
+ board=json.loads((ROOT/'outputs/projection-v3/board.json').read_text())
+ from engine.projection.weekly_diagnostics import build as probability_report, markdown as probability_markdown, original_cards
+ diagnostic=probability_report(ROOT,board['games']);cards=original_cards(ROOT,board['games'],diagnostic)
+ cache=ROOT/'.cloud-private/projection-entries.json';entries=json.loads(cache.read_text()) if cache.exists() else {}
+ b=build_report(cards,reference,entries.get('history',[]));by={c['game_id']:c for c in cards}
+ ledger=[{**e,'actual':by.get(e.get('game_id'),{}).get('grades',{}).get('PROJECTION',{}).get('actual') if by.get(e.get('game_id'),{}).get('grades') else None} for e in entries.get('history',[])]
+ save(OUT/'edit-history.json',ledger);b['board_sha256']=board['content_sha256'];b['published_at']=board['published_at']
  from scripts.reference_lines import weekly_report,render
- from engine.projection.weekly_diagnostics import build as probability_report, markdown as probability_markdown
- b['forecast_diagnostics']=probability_report(ROOT,board['games'])
- b['reference_lines']=weekly_report(board['games'],ROOT)
+ b['forecast_diagnostics']=diagnostic
+ b['reference_lines']=weekly_report(cards,ROOT)
  save(OUT/'reference-lines.json',b['reference_lines']);(OUT/'reference-lines.md').write_text(render(b['reference_lines'],weekly=True))
  save(OUT/'trend.json',b);(OUT/'trend.md').write_text(markdown(b)+'\n'+probability_markdown(b['forecast_diagnostics'])+'\n'+render(b['reference_lines'],weekly=True)+'\nConfidence: near-total — reported errors and diagnostics are arithmetic on saved projections and grades. Move down to high if a source or lineage mismatch invalidates those rows.\n');return b
 
