@@ -1,3 +1,15 @@
+# Latest checkpoint — frozen source restored and consumer verified
+
+Goal ACTIVE; PROGRESS. Full source e14390e56 / archive bce8ac85 restores all 13,504 entries / 2,976,662,468 bytes; both existing runtimes reverify manifest 421443b2. Restored consumer reproduces 16 forecasts, 32 grades and qualified thirty-game diagnostics, plus complete captured refit/locks/grades/retry/rollback in 173.948 application / 175.098 service seconds. All 53 originals/pointer, original mounts/namespaces/native files unchanged. Obsolete expanded source-50 cache retired only after archive/full-tree verification; all archives/receipts retained, 3.56 GB recovered.
+
+Preoperator packet 1294d391 passes five local checks. Next run the captured initial operator from restored source, with actual runtime admission and current data aliased read-only, then bind and verify the final packet. Current packet 10bc9361 remains historical; no activation or authority transfer. Issuing source stays frozen through handoff unless a concrete integrity failure requires change. Actual Friday cutoff, statistical/mean/venue, authentic reviews, sustained-storage and live-cycle requirements remain pending. No new provider calls or spending. See SOURCE-QUALIFIED-RECOVERY.md. Confidence medium in readiness; lower to low on independent restoration/chronology failure.
+
+# Latest checkpoint — final diagnostic source frozen for recovery
+
+Goal ACTIVE; previous turn PROGRESS. Final numerical/report source is frozen through initial handoff unless a concrete integrity failure requires correction. Full standalone archive e14390e56 / bce8ac85 is created on Mac; transfer to host and verified retirement of obsolete expanded source-50 are running under bounded jobs. The archive, original receipts and newer diagnostic restore remain retained. No production record, fit, method, gate, control authority or spending changes.
+
+Plan: SOURCE-QUALIFIED-RECOVERY-PLAN.md. Complete source restoration and fresh existing-runtime verification, restored forecast/grade/report/lifecycle and initial operator, then bind/verify a new packet. Do not reuse packet 10bc9361 for the changed reporting source. Actual Friday cutoff and all original statistical/reviewer/storage/live-cycle requirements remain pending. Confidence medium in readiness until terminal restoration/execution evidence is present; lower to low on independent integrity failure.
+
 # Latest checkpoint — residual and edit diagnostics qualified
 
 Goal ACTIVE; PROGRESS. Main trend, buckets, worst games and edit outcomes now use immutable first grades. Unknown/inactive inputs remain unavailable, explicit roofs/pre-lock winds are required, bucket uncertainty keeps game pairs together, edit revisions use UTC instants and exclude late/ambiguous entries, and reports never initialize fits. Two Tier 2 choices are flagged in the plan and report. Thirty first grades / 122 independently recomputed bucket values agree within 1.34e-15; all 53 originals/pointer unchanged. 611 projection tests and 46 actual-Linux focused tests pass; four diagnostic sections match Mac exactly. No fit or point forecast changes, providers or spending.

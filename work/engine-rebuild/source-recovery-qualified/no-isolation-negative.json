@@ -1,0 +1,6 @@
+{
+  "status": "EXPECTED_REFUSAL",
+  "returncode": 1,
+  "stderr": "Traceback (most recent call last):\n  File \"/mnt/nfl-engine-profiles/source-recovery-qualified/restored_consumer.py\", line 20, in <module>\n    if os.readlink('/proc/self/ns/'+kind)==expected['namespaces'][kind]:raise ValueError('Namespace isolation absent')\n                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: Namespace isolation absent\n",
+  "scope": "No numeric work before namespace admission"
+}
