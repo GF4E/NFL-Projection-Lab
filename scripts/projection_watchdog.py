@@ -39,6 +39,35 @@ def pinned(root, ref):
     return json.loads(raw)
 
 
+def issuance_evidence(root, board, schedule, now):
+    """Read existing due-game receipts; never create or replay an issuance."""
+    deadlines = {g['game_id']: stamp(g['cutoff_at']) for g in schedule
+                 if stamp(g['cutoff_at']) <= now}
+    evidence = {}
+    for card in board['games']:
+        gid = card['game_id']
+        if gid not in deadlines:
+            continue
+        if not any(k in card for k in ('cutoff_forecast_ref', 'forecast_role')):
+            evidence[gid] = {'state': 'LEGACY_NOT_RECORDED'}
+            continue
+        try:
+            from engine.projection import bundle, cutoff_publication
+            if stamp(card['cutoff_at']) != deadlines[gid]:
+                raise ValueError('Card deadline differs from pinned schedule')
+            bundle.verify_card(root, card)
+            receipt = cutoff_publication.verify_receipt(root, card)
+            if stamp(receipt['committed_at']) > now:
+                raise ValueError('Future issuance receipt')
+            evidence[gid] = {'state': 'VERIFIED', 'committed_at': receipt['committed_at'],
+                             'forecast_bundle_ref': receipt['forecast_bundle_ref']}
+        except FileNotFoundError:
+            evidence[gid] = {'state': 'MISSING'}
+        except (OSError, ValueError, KeyError, TypeError):
+            evidence[gid] = {'state': 'INVALID'}
+    return evidence
+
+
 def source_snapshot(root, now, epoch):
     out = root/'outputs/projection-v3'
     board = load(out/'board.json')
@@ -82,7 +111,9 @@ def source_snapshot(root, now, epoch):
             lock = load(root/'outputs'/version/'locks'/f'{gid}.json')
             if lock and all(lock.get(k) == card.get(k) for k in fields):
                 matched[gid] = True
-    result = assess_source(board, schedule, feed['games'], matched, now, epoch)
+    evidence = issuance_evidence(root, board, schedule, now)
+    result = assess_source(board, schedule, feed['games'], matched, now, epoch, evidence)
+    result['issuance_evidence'] = evidence
     result['schedule_ref'] = ref
     result['final_received_at'] = feed['received_at']
     result['final_source_sha256'] = sha

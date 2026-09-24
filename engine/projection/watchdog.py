@@ -55,7 +55,7 @@ def valid_points(card):
                and math.isfinite(p[k]) for k in ('home_points', 'away_points', 'margin', 'total'))
 
 
-def assess_source(board, schedule, finals, lock_matches, now, epoch):
+def assess_source(board, schedule, finals, lock_matches, now, epoch, issuance_evidence=None):
     """Schedule, not existing board rows, supplies the denominator."""
     identity = board_identity(board)
     if stamp(identity['published_at']) > now:
@@ -68,6 +68,8 @@ def assess_source(board, schedule, finals, lock_matches, now, epoch):
               'finals_graded': 0, 'grade_latency_unknown_first_seen': 0}
     misses, missing_locks, ungraded, conflicts = [], [], [], []
     all_misses = []
+    issuance_evidence = issuance_evidence or {}
+    on_time, unknown_issuance, failed_issuance, bad_receipts = [], [], [], []
     for scheduled in due:
         gid = scheduled['game_id']; card = games.get(gid) or {}
         cutoff = stamp(scheduled['cutoff_at'])
@@ -76,6 +78,25 @@ def assess_source(board, schedule, finals, lock_matches, now, epoch):
                      and stamp(card['issued_at']) < cutoff)
         except (KeyError, TypeError, ValueError):
             valid = False
+        receipt = issuance_evidence.get(gid, {})
+        receipt_valid = False
+        if receipt.get('state') == 'VERIFIED':
+            try:
+                committed = stamp(receipt['committed_at'])
+                receipt_valid = (stamp(card['issued_at']) <= committed < cutoff
+                                 and committed <= now
+                                 and receipt['forecast_bundle_ref'] == card['forecast_bundle_ref'])
+            except (KeyError, TypeError, ValueError):
+                pass
+        new_contract = any(k in card for k in ('cutoff_forecast_ref', 'forecast_role'))
+        if valid and receipt_valid and new_contract:
+            on_time.append(gid)
+        elif valid and not new_contract and receipt.get('state') in (None, 'LEGACY_NOT_RECORDED'):
+            unknown_issuance.append(gid)
+        else:
+            failed_issuance.append(gid)
+        if new_contract and not receipt_valid:
+            bad_receipts.append(gid)
         counts['valid_pregame_forecasts'] += int(valid)
         counts['retrospective_games'] += int(card.get('evidence') == 'RETROSPECTIVE')
         counts['missing_or_invalid_pregame_games'] += int(not valid)
@@ -107,7 +128,17 @@ def assess_source(board, schedule, finals, lock_matches, now, epoch):
     if conflicts:
         findings.append(issue('FINAL_SOURCE_CONFLICT', games=sorted(conflicts)))
     counts['all_missing_or_invalid_game_ids'] = sorted(all_misses)
-    counts['on_time_committed_issuance'] = 'NOT_RECORDED: physical commit receipt required'
+    if bad_receipts:
+        findings.append(issue('ISSUANCE_RECEIPT_UNVERIFIED', games=sorted(bad_receipts)))
+    counts['on_time_committed_issuance'] = {
+        'definition': 'Valid local forecast bundle durably committed strictly before T-75; public delivery measured separately',
+        'state': 'PARTIAL' if unknown_issuance else ('MEASURED' if due else 'NO_DUE_GAMES'),
+        'eligible_due_games': len(due), 'verified_on_time_games': len(on_time),
+        'unknown_games': len(unknown_issuance), 'failed_games': len(failed_issuance),
+        'rate': len(on_time)/len(due) if due and not unknown_issuance else None,
+        'verified_game_ids': sorted(on_time), 'unknown_game_ids': sorted(unknown_issuance),
+        'failed_game_ids': sorted(failed_issuance),
+    }
     counts['grade_latency'] = 'UNKNOWN: first verified availability per game not recorded'
     counts['scope'] = 'All due games in the pinned current-season schedule; retrospective included in denominator'
     return {'identity': identity, 'metrics': counts, 'findings': findings}
