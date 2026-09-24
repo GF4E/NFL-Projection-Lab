@@ -96,7 +96,7 @@ class WatchdogTests(unittest.TestCase):
             schedule=[{'game_id':'2026_02_A_B','season':'2026','game_type':'REG','gameday':'2026-09-21','gametime':'20:00'}]
             raw=json.dumps(schedule).encode(); (work/'schedule.json').write_bytes(raw)
             (work/'source-manifest.json').write_text(json.dumps({'schedule':{'path':'work/projection-v1/schedule.json','sha256':hashlib.sha256(raw).hexdigest()}}))
-            raw=b'qualified fixture final source'; sha=hashlib.sha256(raw).hexdigest()
+            raw=b'game_id,away_score,home_score,result,total\n2026_02_A_B,14,17,3,31\n'; sha=hashlib.sha256(raw).hexdigest()
             (out/'final-sources').mkdir(); (out/'final-sources'/f'{sha}.csv').write_bytes(raw)
             feed={'received_at':NOW.isoformat(),'source_sha256':sha,'games':{},'refresh_operation_id':'op'}
             (out/'final-feed.json').write_text(json.dumps(feed)); (out/'operations').mkdir()

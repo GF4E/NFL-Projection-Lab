@@ -90,6 +90,8 @@ The monitor never loads browser credentials, takes ownership, restarts a paid wo
 
 Confidence: high for the explicitly tested recovery transitions and invariant preservation under their stated fault model; this is not a claim of complete operational reliability. Lower to medium if a production caller bypasses these controls or an untested filesystem failure changes the commit semantics.
 
+The observer now compares every derived final against the parsed, hash-verified current source. A wrong derived score is FINAL_FEED_VALUE_CONFLICT; a source final omitted from the feed is FINAL_FEED_ROW_MISSING; a retained score lacking a row in the current source is FINAL_SOURCE_ROW_UNAVAILABLE, not proof the retained score is wrong. Alerts use only due games in the pinned schedule. Preserve original grades and obtain their exact source association before making a linked correction; the monitor performs no repair. See FINAL-SOURCE-RECONCILIATION.md.
+
 ## Scoring bundles
 
 New cards carry forecast_bundle_ref and release_ref. Resolve them with engine.projection.bundle.verify_card(root, card); never reconstruct from a version name or current fit pointer. A failed hash, schema, missing calibration or changed forecast stops locking/grading/publication. Restore the exact referenced record from verified evidence; do not strip references to force the legacy path. Old cards retain their original convention and frozen calibration registry.

@@ -1,0 +1,198 @@
+{
+  "checked_at": "2026-09-24T03:55:11.145323+00:00",
+  "elapsed_seconds": 13.70730905001983,
+  "fixture_observation_seconds": 4.900489846011624,
+  "host_source": {
+    "final_commit_receipt": "VERIFIED",
+    "final_received_at": "2026-09-24T03:53:50.429854+00:00",
+    "final_source_reconciliation": {
+      "carried_without_current_source": 0,
+      "conflicting_games": 0,
+      "feed_games": 7308,
+      "findings": [],
+      "grade_comparison_basis": "Parsed hash-verified current source; carried-only rows remain unverified",
+      "matched_games": 7308,
+      "source_games": 7308,
+      "source_games_missing_from_feed": 0
+    },
+    "final_source_sha256": "dde04897fdaac90f8689c9b0dffa9361a2cf583b28e3830b2220082b253262c2",
+    "findings": [],
+    "identity": {
+      "content_sha256": "e07eb11489d3a495e6cadbf07c31f0fa0e7b1f082af693a59ee22426b594f250",
+      "games": 48,
+      "published_at": "2026-09-24T02:04:49.022957+00:00"
+    },
+    "issuance_evidence": {
+      "2026_01_ARI_LAC": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_ATL_PIT": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_BAL_IND": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_BUF_HOU": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_CHI_CAR": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_CLE_JAX": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_DAL_NYG": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_DEN_KC": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_GB_MIN": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_MIA_LV": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_NE_SEA": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_NO_DET": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_NYJ_TEN": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_SF_LA": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_TB_CIN": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_01_WAS_PHI": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_CAR_ATL": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_CIN_HOU": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_CLE_TB": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_DET_BUF": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_GB_NYJ": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_IND_KC": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_JAX_DEN": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_LV_LAC": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_MIA_SF": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_MIN_CHI": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_NO_BAL": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_NYG_LA": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_PHI_TEN": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_PIT_NE": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_SEA_ARI": {
+        "state": "LEGACY_NOT_RECORDED"
+      },
+      "2026_02_WAS_DAL": {
+        "state": "LEGACY_NOT_RECORDED"
+      }
+    },
+    "metrics": {
+      "all_missing_or_invalid_game_ids": [
+        "2026_01_NE_SEA",
+        "2026_01_SF_LA"
+      ],
+      "eligible_due_games": 32,
+      "finals_available": 32,
+      "finals_graded": 32,
+      "grade_latency": "UNKNOWN: first verified availability per game not recorded",
+      "grade_latency_unknown_first_seen": 32,
+      "matched_frozen_records": 30,
+      "missing_or_invalid_pregame_games": 2,
+      "on_time_committed_issuance": {
+        "definition": "Valid local forecast bundle durably committed strictly before T-75; public delivery measured separately",
+        "eligible_due_games": 32,
+        "failed_game_ids": [
+          "2026_01_NE_SEA",
+          "2026_01_SF_LA"
+        ],
+        "failed_games": 2,
+        "rate": null,
+        "state": "PARTIAL",
+        "unknown_game_ids": [
+          "2026_01_ARI_LAC",
+          "2026_01_ATL_PIT",
+          "2026_01_BAL_IND",
+          "2026_01_BUF_HOU",
+          "2026_01_CHI_CAR",
+          "2026_01_CLE_JAX",
+          "2026_01_DAL_NYG",
+          "2026_01_DEN_KC",
+          "2026_01_GB_MIN",
+          "2026_01_MIA_LV",
+          "2026_01_NO_DET",
+          "2026_01_NYJ_TEN",
+          "2026_01_TB_CIN",
+          "2026_01_WAS_PHI",
+          "2026_02_CAR_ATL",
+          "2026_02_CIN_HOU",
+          "2026_02_CLE_TB",
+          "2026_02_DET_BUF",
+          "2026_02_GB_NYJ",
+          "2026_02_IND_KC",
+          "2026_02_JAX_DEN",
+          "2026_02_LV_LAC",
+          "2026_02_MIA_SF",
+          "2026_02_MIN_CHI",
+          "2026_02_NO_BAL",
+          "2026_02_NYG_LA",
+          "2026_02_PHI_TEN",
+          "2026_02_PIT_NE",
+          "2026_02_SEA_ARI",
+          "2026_02_WAS_DAL"
+        ],
+        "unknown_games": 30,
+        "verified_game_ids": [],
+        "verified_on_time_games": 0
+      },
+      "retrospective_games": 2,
+      "scope": "All due games in the pinned current-season schedule; retrospective included in denominator",
+      "valid_pregame_forecasts": 30
+    },
+    "schedule_ref": {
+      "path": "work/projection-v1/data/schedule-dbb5ff4f231aaf3bac1287c12845169aa99c2a17b76d67f4558604abd65d8964.json",
+      "sha256": "dbb5ff4f231aaf3bac1287c12845169aa99c2a17b76d67f4558604abd65d8964"
+    }
+  },
+  "max_rss_bytes": 58912768,
+  "population": "Repeated one real publisher fixture; cost probe, not 16 distinct games",
+  "source_sha256": {
+    "engine.projection.watchdog": "b3c472cfbc1ca27cb27c00e72e984b221d0bba1d8e979a2c1ca8ffc13f889cad",
+    "scripts.projection_watchdog": "5ae22c64fd3fe2d322e491ae0c1b6e2d166cdc953d760f95144d6df10de0e8d3"
+  },
+  "successful": true,
+  "synthetic_checks": 16
+}

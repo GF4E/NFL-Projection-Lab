@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from engine.projection.storage import save
 from engine.projection.watchdog import (UTC, POLICY, stamp, digest, board_identity,
-                                       assess_source, assess_host, assess_outside, transition, notification_transition)
+                                       assess_source, assess_host, assess_outside, transition, notification_transition, reconcile_final_scores)
 from engine.forecast_system.calendar import schedule_kickoff
 
 HOST_STATE = Path('/run/nfl-engine-monitor')
@@ -99,7 +99,14 @@ def source_snapshot(root, now, epoch):
     if stamp(feed['received_at']) > now:
         raise ValueError('Future final retrieval')
     from engine.projection.source_archive import read_source
-    read_source(root,feed)
+    from engine.projection.finals import parse
+    source_finals = parse(read_source(root,feed))
+    reconciliation = reconcile_final_scores(source_finals, feed['games'], schedule, now)
+    # Retain only the pinned population before loading forecast bundles. The
+    # whole-source reconciliation above remains reported, without holding all
+    # historical score dictionaries during the bounded observer's other work.
+    scheduled_ids = {g['game_id'] for g in schedule}
+    source_finals = {gid:score for gid,score in source_finals.items() if gid in scheduled_ids}
     sha = feed['source_sha256']
     matched = {}
     fields = ('version', 'projection', 'ours', 'evidence', 'freeze_time')
@@ -112,7 +119,9 @@ def source_snapshot(root, now, epoch):
             if lock and all(lock.get(k) == card.get(k) for k in fields):
                 matched[gid] = True
     evidence = issuance_evidence(root, board, schedule, now)
-    result = assess_source(board, schedule, feed['games'], matched, now, epoch, evidence)
+    result = assess_source(board, schedule, source_finals, matched, now, epoch, evidence)
+    result['findings'].extend(reconciliation['findings'])
+    result['final_source_reconciliation'] = reconciliation
     result['issuance_evidence'] = evidence
     result['schedule_ref'] = ref
     result['final_received_at'] = feed['received_at']

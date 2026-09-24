@@ -55,6 +55,34 @@ def valid_points(card):
                and math.isfinite(p[k]) for k in ('home_points', 'away_points', 'margin', 'total'))
 
 
+def reconcile_final_scores(source_finals, feed_finals, schedule, now):
+    """Source identity alone cannot verify a derived score or a carried row."""
+    if not isinstance(source_finals, dict) or not isinstance(feed_finals, dict):
+        raise ValueError('Final score maps required')
+    source_ids, feed_ids = set(source_finals), set(feed_finals)
+    conflicts = []
+    for gid in source_ids & feed_ids:
+        value = feed_finals[gid]
+        if (value != source_finals[gid] or not isinstance(value, dict)
+                or any(isinstance(value.get(k), bool) for k in ('home_score', 'away_score'))):
+            conflicts.append(gid)
+    carried = feed_ids - source_ids
+    omitted = source_ids - feed_ids
+    due = {g['game_id'] for g in schedule if stamp(g['cutoff_at']) <= now}
+    findings = []
+    for code, affected in (('FINAL_FEED_VALUE_CONFLICT', set(conflicts)),
+                           ('FINAL_SOURCE_ROW_UNAVAILABLE', carried),
+                           ('FINAL_FEED_ROW_MISSING', omitted)):
+        if affected & due:
+            findings.append(issue(code, games=sorted(affected & due)))
+    return {'source_games': len(source_ids), 'feed_games': len(feed_ids),
+            'matched_games': len(source_ids & feed_ids)-len(conflicts),
+            'conflicting_games': len(conflicts), 'carried_without_current_source': len(carried),
+            'source_games_missing_from_feed': len(omitted),
+            'grade_comparison_basis': 'Parsed hash-verified current source; carried-only rows remain unverified',
+            'findings': findings}
+
+
 def assess_source(board, schedule, finals, lock_matches, now, epoch, issuance_evidence=None):
     """Schedule, not existing board rows, supplies the denominator."""
     identity = board_identity(board)
