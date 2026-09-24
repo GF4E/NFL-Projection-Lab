@@ -1,3 +1,5 @@
+> Current source qualification: diagnostic source e2959f43d changes the reporting closure. Packet 10bc9361 is retained historical evidence and cannot admit this executable. Refresh exact-source restoration/consumer/operator evidence before initial activation. See DIAGNOSTIC-QUALIFICATION.md.
+
 # Initial chronology operator runbook
 
 This path is implemented but not yet activated. It does not promote the corrected control or register an experiment. Current packet 10bc9361 binds the verified fifty-file issuing source and restored diagnostic module. Earlier forty-six-file and source-50 packets are historical and cannot admit changed source. The pointer is work/engine-rebuild/release-review/current-ref.json; always resolve and reverify it. Actual method-promotion reviewer decisions remain mandatory separately. Existing Tier 2 chronology flags do not create an additional approval stop.

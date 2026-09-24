@@ -1,3 +1,5 @@
+> Current source qualification: diagnostic source e2959f43d changes the reporting closure. Packet 10bc9361 is retained historical evidence and cannot admit this executable. Refresh exact-source restoration/consumer/operator evidence before initial activation. See DIAGNOSTIC-QUALIFICATION.md.
+
 # Rebuild operational runbook — current operating instructions
 
 The goal remains active. Current operating facts below supersede obsolete next-action statements in historical reports; those reports and immutable review snapshots remain preserved. Recovery and same-code handoff/rollback are verified on captured inputs. Actual corrected issuance/control authority, the statistical gates, sustained storage reserve, authentic method reviews and an observed live cycle remain incomplete.

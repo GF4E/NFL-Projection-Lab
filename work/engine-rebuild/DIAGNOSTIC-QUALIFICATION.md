@@ -22,7 +22,7 @@ Mac validation: 33 focused checks and 611 full projection checks pass, with thre
 
 ## Scope and remaining work
 
-This verifies staged source on captured production inputs. Normal host installation/publication is recorded separately after push; no new website display is claimed. The changed reporting script belongs to the issuing source closure: recovery packet 10bc9361 remains historical and must not qualify the changed executable. Refresh exact-source recovery before initial activation; never weaken admission.
+Normal host installation and scheduled publication are now verified at 2026-09-24T00:56:32.194155+00:00, checkout 2e18e1563e04a138571b09d658ad8aa6e57da36f. All three implementation hashes match, all four diagnostic sections match the captured independent report, and all 53 host/local originals match. First inspection preserved SOURCE_INSTALLED_REPORT_PENDING; the next completed publication is INSTALLED_AND_PUBLISHED. See diagnostic-qualification/host-installed-attempt2.json. No new website display is claimed. The changed reporting script belongs to the issuing source closure: recovery packet 10bc9361 remains historical and must not qualify the changed executable. Refresh exact-source recovery before initial activation; never weaken admission.
 
 The approved storage migration remains in place; a current snapshot shows approximately 3.71 GB free on root and 4.02 GB on the volume, not a sustained reserve. All five correctly named production timers are active. The initial inspection used three nonexistent shorthand unit names; those inactive responses were naming errors, not service failures. No service was restarted on that basis.
 
