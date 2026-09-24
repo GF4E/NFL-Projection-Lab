@@ -1,0 +1,90 @@
+{
+  "checked_at": "2026-09-24T03:58:14.603187+00:00",
+  "final_source_reconciliation": {
+    "carried_without_current_source": 0,
+    "conflicting_games": 0,
+    "feed_games": 7308,
+    "findings": [],
+    "grade_comparison_basis": "Parsed hash-verified current source; carried-only rows remain unverified",
+    "matched_games": 7308,
+    "source_games": 7308,
+    "source_games_missing_from_feed": 0
+  },
+  "frozen_issuing_files_verified": 50,
+  "grade_latency": "UNKNOWN: first verified availability per game not recorded",
+  "host_commit": "9782d8418669d9003a5833444232b3c3706794ba",
+  "issuance_metric": {
+    "definition": "Valid local forecast bundle durably committed strictly before T-75; public delivery measured separately",
+    "eligible_due_games": 32,
+    "failed_game_ids": [
+      "2026_01_NE_SEA",
+      "2026_01_SF_LA"
+    ],
+    "failed_games": 2,
+    "rate": null,
+    "state": "PARTIAL",
+    "unknown_game_ids": [
+      "2026_01_ARI_LAC",
+      "2026_01_ATL_PIT",
+      "2026_01_BAL_IND",
+      "2026_01_BUF_HOU",
+      "2026_01_CHI_CAR",
+      "2026_01_CLE_JAX",
+      "2026_01_DAL_NYG",
+      "2026_01_DEN_KC",
+      "2026_01_GB_MIN",
+      "2026_01_MIA_LV",
+      "2026_01_NO_DET",
+      "2026_01_NYJ_TEN",
+      "2026_01_TB_CIN",
+      "2026_01_WAS_PHI",
+      "2026_02_CAR_ATL",
+      "2026_02_CIN_HOU",
+      "2026_02_CLE_TB",
+      "2026_02_DET_BUF",
+      "2026_02_GB_NYJ",
+      "2026_02_IND_KC",
+      "2026_02_JAX_DEN",
+      "2026_02_LV_LAC",
+      "2026_02_MIA_SF",
+      "2026_02_MIN_CHI",
+      "2026_02_NO_BAL",
+      "2026_02_NYG_LA",
+      "2026_02_PHI_TEN",
+      "2026_02_PIT_NE",
+      "2026_02_SEA_ARI",
+      "2026_02_WAS_DAL"
+    ],
+    "unknown_games": 30,
+    "verified_game_ids": [],
+    "verified_on_time_games": 0
+  },
+  "observer_checked_at": "2026-09-24T03:57:50.950415+00:00",
+  "observer_source_sha256": "bb2d23be696e53222a5f7c22c988f70ceb8cf373ba8df5a632a5f1907f8fb0cf",
+  "originals_verified": 62,
+  "services": "TimeoutStartUSec=30s\nResult=success\nExecMainStartTimestamp=Thu 2026-09-24 03:57:34 UTC\nExecMainExitTimestamp=Thu 2026-09-24 03:57:52 UTC\nExecMainStatus=0\nMemoryMax=67108864\nId=nfl-engine-watchdog.service\nActiveState=inactive\n\nResult=success\nId=nfl-engine-watchdog.timer\nActiveState=active\n\nResult=success\nId=nfl-engine-capture.timer\nActiveState=active\n\nResult=success\nId=nfl-cutoff-state.timer\nActiveState=active\n",
+  "source_files": {
+    "engine/projection/storage_measurements.py": "c2fe6882b5a28935c507fc222fe0656c797d25c65209a8996aac60d0a222e59d",
+    "engine/projection/watchdog.py": "b3c472cfbc1ca27cb27c00e72e984b221d0bba1d8e979a2c1ca8ffc13f889cad",
+    "scripts/projection_watchdog.py": "5ae22c64fd3fe2d322e491ae0c1b6e2d166cdc953d760f95144d6df10de0e8d3"
+  },
+  "storage": {
+    "filesystems": {
+      "artifacts": {
+        "filesystem_id": 17221713838075122595,
+        "free_bytes": 3105009664,
+        "free_inodes": 523370,
+        "total_bytes": 21125308416
+      },
+      "root": {
+        "filesystem_id": 8218120851669157479,
+        "free_bytes": 3705270272,
+        "free_inodes": 1034699,
+        "total_bytes": 9283444736
+      }
+    },
+    "free_bytes": 3105009664,
+    "free_inodes": 523370,
+    "headroom_qualified": false
+  }
+}

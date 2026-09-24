@@ -16,7 +16,9 @@ The first Linux candidate runs those seven fixtures and reads the real host unde
 
 No point forecast, distribution, gate, control authority, release pointer, provider call, paid resource, lock or first grade changes. This is detection and truthful reporting, not automatic repair of corrupted grades. E-CAL's future actual-cutoff/control/publication association, Tuesday ordering, research capacity qualification and genuine reviewers remain prerequisites; conditional-mean and venue work remain pending. Grade source association and exact latency are still incomplete acceptance items.
 
-Scheduled host installation evidence will be recorded after the push. The full rebuild remains active and incomplete; this increment must not be treated as a gate decision or accuracy gain.
+Source commit 829daaf34 was pushed and installed through the existing scheduler. At 2026-09-24T03:58:14Z the host checkout was 9782d8418669d9003a5833444232b3c3706794ba. The scheduled 03:57:34–03:57:52Z observer invocation completed with exit zero and the expected source digest; its report independently recorded 7,308 matching rows and no conflicts. All fifty issuing files and 62 historical locks/grades matched. Watcher, capture and cutoff timers remained active. Installed JSON and terminal journal are retained. The first 50-second observation window expired before the new scheduled receipt was witnessed; a subsequent read of the same installed process succeeded without restarting any worker.
+
+The full rebuild remains active and incomplete; this increment is neither a gate decision nor an accuracy gain.
 
 Least certain: per-game provenance for carry-forward scores when a later source omits a row. Accordingly their validity is unknown until their original association is qualified.
 
