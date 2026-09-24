@@ -1,3 +1,9 @@
+# Latest checkpoint — diagnostic release restored and reproduced
+
+Goal ACTIVE; PROGRESS. Full source 3990df9de restore and both installed/restored runtimes verified. Isolated consumer reproduces 16 forecasts, 32 grade calculations and the exact thirty-game weekly report, plus full captured refit/lock/grade/retry/rollback in 221.817 application / 247.765 service seconds. All 53 originals/pointer and host mounts unchanged. Verified obsolete source-76 expanded cache retired under existing authority; all archives/receipts retained. No new spending or provider request. See SOURCE-DIAGNOSTICS-RECOVERY.md and the Tier 2 cache classification in its plan.
+
+Pre-operator packet 429874d4 passes five local checks; actual runtime admission, captured initial operator and final-host checks follow before the current pointer is replaced. Actual Friday cutoff, issuing/public/control qualification, calibration/mean/venue work, authentic reviews and sustained storage growth remain open. Confidence medium in readiness; lower to low on independent recovery/chronology disagreement.
+
 # Latest checkpoint — weekly first-grade probability metrics verified
 
 Goal ACTIVE; PROGRESS. Weekly trend now computes original-calibration team/margin/total proper scores and interval metrics from immutable first grades, with home/away errors, exact-lineage strata, reliability and descriptive paired-game uncertainty. 30 first grades / 3,742 independent scalar checks agree within 1.43e-14; all 53 originals/pointer unchanged. Twelve uniquely reconstructed legacy associations and eight missing separate locks remain explicit; two retrospective games lacking first-grade records are named shortfalls. 31 focused and 596 broad tests pass; Linux captured report matches Mac byte-for-byte. No fitting, method gate, numerical forecast change, paid pull or new spending.

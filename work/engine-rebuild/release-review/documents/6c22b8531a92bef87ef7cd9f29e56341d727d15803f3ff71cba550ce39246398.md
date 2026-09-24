@@ -1,0 +1,21 @@
+# Recovery qualification for the weekly diagnostic release
+
+REVIEW REQUESTED (Tier 2): the obsolete expanded source-76 recovery tree was classified as a regenerable cache after independent archive and full-tree verification. The alternative was retaining every expanded duplicate and purchasing more capacity. The archive, complete removal manifest, all historical receipts and newer source-50 restore remain preserved. No unique production record was removed. This uses existing cache-only cleanup authority, not a new retention policy.
+
+The approved 20 GiB migration remains in place. This work refreshes executable recovery for the reporting call introduced in `d2f7adaffe477d954c4fef78be18a1fab1d92829`; it does not purchase another volume, change forecast mathematics or qualify a statistical improvement.
+
+## Preserved archive and new restore
+
+The retired expanded tree was pinned to `76f840b0569d29043eec83acab0270dd003143f0`. Its standalone archive `fc1e18bc7c099fcaff6a5719768fcb5ce3c7b4cb6d6c087b0f1087ba3e59b279` was freshly verified on Mac and host, along with its clean complete tree and absence of mounted use. A private hash manifest records all 14,487 removed entries. The operation recovered 3,545,944,064 bytes and retained all historical archives and receipts. The exact-invocation journal confirms success in 336.866 seconds. See `source-recovery-diagnostics/cache-retirement.json` and `cache-terminal.json`.
+
+The new standalone archive pins source `3990df9deb0a01eb26e99c7d5f65c7f1a84bfa86`, SHA-256 `f1abdec6da77ec9529849a048ac8b999b43dd03dd52ba5b8486e03a7c6dd3f01`. Full restore verified 13,391 entries and 2,965,411,522 bytes in 346.885 application seconds, including strict Git checks, file content/mode/link verification and syncfs. No alternate repository or remote is required by the archive. Both installed and restored runtimes freshly match manifest `421443b220e5d492d8baf7c714c819ff44f4aa296d235f22aa9b7c1887454a01`.
+
+The source restore's actual loaded limits were 45 minutes, 4 GiB and one CPU with a private network. `source-terminal.json` verifies the exact successful invocation; `source-live-properties.txt` separately proves limits while loaded. Defaults returned after a transient unit unloads are not used as evidence. The runtime preparation's original mount/network namespaces match the outside host. The negative no-isolation consumer refuses before numerical work.
+
+## Execution status
+
+Restored consumer verification passed in 221.817 application / 247.765 service seconds, with peak lifecycle RSS 241,799,168 bytes. Sixteen captured forecasts and thirty-two grade calculations reproduce; the thirty-game weekly diagnostics report is byte-identical, SHA-256 `d68a73caf2555ee1f7858d156c5e9c2e51e93c8e30568675e9898ca4d67a2763`. The captured 2,927-game refit, sixteen locks/synthetic grades, retry and rollback all pass under actual dispatch exclusion and read-only restored mounts. External acceptance verifies all 52 original locks/grades plus active-fit pointer unchanged, along with original mounts/namespaces and native libraries. Initial-operator and final-host packet verification remain pending on this source. Earlier packets are historical evidence and cannot admit changed source files. Seventeen release-preflight fixtures also pass. A local SCP brace-expansion failure required explicit source filenames; it did not rerun the consumer or change evidence.
+
+No live release, revised control authority, registration, numerical candidate, provider request or new spending is asserted. The actual Friday September 25 cutoff and issuing/public association remain separate prerequisites. Whole-machine disaster recovery, sustained storage growth, authentic reviewer decisions and the full calibration/mean/venue objectives remain open.
+
+Confidence: medium in release readiness, meaning verified evidence still depends on choices and live conditions that could reasonably differ. Lower to low if an independent restore or chronology check fails. Content preservation is separately supported by complete byte-level verification; it is not proof of better forecasts.
