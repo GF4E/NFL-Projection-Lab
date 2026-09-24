@@ -1,3 +1,9 @@
+# Latest checkpoint — restored diagnostic release handoff verified
+
+Goal ACTIVE; PROGRESS. Captured initial operator passes on restored source/runtime in 230.780 application / 250.783 service seconds, 256,200,704-byte peak RSS. Stage, activation, exact retry, fourteen Friday-state forecasts and rollback preserve the Thursday fixture lock. All 53 originals/pointer, fifty issuing files and original mounts/namespaces unchanged. No live activation or authority transfer.
+
+Final technical packet 10bc9361 binds complete consumer/operator recovery evidence; five local checks pass. Next: six actual-host technical checks against its private runtime manifest, then actual Friday September 25 06:00 Pacific cutoff and qualified issuing/public/control association before E-CAL. Full calibration/mean/venue, authentic reviews, sustained growth and observed live-cycle requirements remain open. No new spending/provider requests. Confidence medium in readiness; lower to low on independent recovery/chronology disagreement.
+
 # Latest checkpoint — diagnostic release restored and reproduced
 
 Goal ACTIVE; PROGRESS. Full source 3990df9de restore and both installed/restored runtimes verified. Isolated consumer reproduces 16 forecasts, 32 grade calculations and the exact thirty-game weekly report, plus full captured refit/lock/grade/retry/rollback in 221.817 application / 247.765 service seconds. All 53 originals/pointer and host mounts unchanged. Verified obsolete source-76 expanded cache retired under existing authority; all archives/receipts retained. No new spending or provider request. See SOURCE-DIAGNOSTICS-RECOVERY.md and the Tier 2 cache classification in its plan.
