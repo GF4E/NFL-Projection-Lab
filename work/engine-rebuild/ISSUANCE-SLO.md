@@ -19,7 +19,13 @@ This measures durable local forecast-bundle availability, not Git acknowledgment
 - All fifty issuing files match the pre-change hashes.
 - Initial Linux attempt loaded the entire publication unittest harness inside the observer's limits and timed out at 30 seconds, before emitting a fixture result. Exact failed unit and journal retained; peak cgroup memory 58,810,368 bytes. This is not a successful observer qualification.
 - Corrected measurement prepares the synthetic fixture outside the timed process. Under actual service identity, 64 MiB, zero swap, 10% CPU and 30-second cap, the observer reads actual host data and verifies the same real publisher-created synthetic bundle sixteen times, without changing any fixture file. It succeeds in 8.915 seconds; reported process maximum RSS 57,942,016 bytes; fixture checks 3.709 seconds. This is a repeated-bundle cost probe, not sixteen distinct games or a full-season stress qualification. No resource cap was relaxed.
-- Source hashes, actual host assessment, successful/failed invocation journals and both logs are retained alongside this report. The new-contract path is fixture-qualified; actual host history is still legacy. Scheduled installation evidence will be added after push.
+- Source hashes, actual host assessment, successful/failed invocation journals and both logs are retained alongside this report. The new-contract path is fixture-qualified; actual host history is still legacy. Scheduled installation evidence is recorded below.
+
+## Verified scheduled installation
+
+Source commit 32204ecb4 was pushed to engine-v2 and installed through the existing scheduler. At 2026-09-24T03:37:38Z the host checkout was 07f19c6e7f4cc0519ddfe7be4935ba7bbecd8c09. The actual scheduled observer emitted the expected three-file source digest and PARTIAL issuance result at 03:37:37Z. Its 03:37:27–03:37:38 invocation completed successfully, exit zero, 1.134 CPU seconds, 32.2 MiB reported peak memory and 20.7 MiB swap peak under its unchanged 64 MiB/30-second unit. The separate candidate cost probe used zero swap; the installed unit's pre-existing swap policy was not changed. Journal and installed receipt are retained.
+
+All 50 frozen issuing files and all 62 locally enumerated historical projection locks/grades match on the host. The watcher, capture and cutoff timers remain active. Actual free space was 3,705,503,744 bytes on root and 3,106,787,328 bytes on the artifact filesystem (see exact installed receipt if comparing a later poll); sustainable headroom remains unqualified. No statistical release or new-contract live success is claimed.
 
 ## Remaining dependencies
 
