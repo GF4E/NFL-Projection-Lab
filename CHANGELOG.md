@@ -1,3 +1,13 @@
+## 2026-09-24 — register E-MC after E-PFF; no execution
+
+Registered E-MC intent and hashed work/e-mc/registration.json. Binding precedence E-GROUPS → E-PFF → E-MC; BOTH predecessor reports must be verified before activation. Their specifications/reports were not found, so dependencies remain explicitly unresolved; no invented predecessor results or changes to the current active experiment. Tuesday activation/closeout/clock and authoritative deployed-control checks remain required.
+
+E-MC targets distribution SHAPE with 10,000 seeded drive simulations, unchanged point forecasts, a questionable-QB mixture challenger, mean team-point CRPS primary (1% improvement), ±3-point 50/80 coverage, and per-team half-point calibration. A fixed-input simulation SD and Season convergence display are deferred deliverables. No fitting, draws, promotion, deployment or website change. Existing model/locks remain unchanged.
+
+CONVENTIONS: PLAN.md publishes Tier 1 C01–C04 and Tier 2 REVIEW REQUESTED C05–C06 (conditional SD floor and fixed reliability bins). Tier 3 B01–B04 reserve exact integer-mean calibration, unspecified simulation/rate definitions, mixture data qualification and inherited gate scope for a batched pre-execution decision. No gate is silently added or removed. Newly consolidated FINDINGS.md cites the existing E-UNC variance artifact: coefficient uncertainty <0.2% in all ten seasonal rows, explicitly REPLAY with residual discrepancy and no physical-floor claim. Hashes checked without rerunning an experiment.
+
+Confidence near-total in registration order and saved-row arithmetic, meaning arithmetic on verified records; lower to high on independent hash or row disagreement. No predictive-improvement claim.
+
 ## 2026-09-23 — reconcile derived final scores against archived source rows
 
 Infrastructure observer correction. CONVENTIONS Tier 1: hashes bind bytes but do not prove score transformation; use the existing parser on verified raw data and compare due-game grades against it. Tier 2 REVIEW REQUESTED: retained scores omitted from the current raw source are UNKNOWN, not wrong; no unbounded historical search or original-record rewrite. Actual host 7,308/7,308 agreement; synthetic self-consistent wrong feed/board is detected. Seven new/35 focused and 657 broad tests pass (three skips); final version bounded Linux probe passes. All fifty issuing files unchanged. No fitting, model/gate/pointer change, provider request or spending. See work/engine-rebuild/FINAL-SOURCE-RECONCILIATION.md. Confidence near-total in verified current row equality; lower to high on independent parsing/hash disagreement.
