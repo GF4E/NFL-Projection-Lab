@@ -1,3 +1,7 @@
+## 2026-09-23 — verify diagnostic recovery packet on installed host
+
+Infrastructure evidence only. Packet 10bc9361 passes six actual-host technical checks, with freshly verified runtime, fifty-file source closure, fit/calibration/training identities and retained publication evidence. Exact-invocation journal plus live resource properties prove completion; all 53 originals/pointer unchanged. Host checkout 258bae398 and issuing-source d2f7adaff are explicitly distinguished. Actual Friday cutoff/live-control association, sustained capacity and all statistical/reviewer objectives remain open. No new spending/provider request or activation. See work/engine-rebuild/SOURCE-DIAGNOSTICS-RECOVERY.md. Confidence medium in readiness; lower to low on independent recovery/chronology disagreement.
+
 ## 2026-09-23 — verify restored diagnostic-source initial handoff
 
 Infrastructure evidence only. Full captured initial operator passes on restored source/runtime with current data aliased read-only, including Thursday-lock preservation, fourteen Friday-state forecasts, stage/activation/exact retry and rollback. External acceptance preserves all 53 originals/pointer and original mounts. Packet 10bc9361 binds the evidence; actual-host final checks follow. No live activation, source-math change, gate, control-authority change, spending or provider request. See work/engine-rebuild/SOURCE-DIAGNOSTICS-RECOVERY.md. Confidence medium in readiness; lower to low on independent integrity or chronology disagreement.

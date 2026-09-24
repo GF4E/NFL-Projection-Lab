@@ -1,3 +1,9 @@
+# Latest checkpoint — diagnostic recovery packet verified on actual host
+
+Goal ACTIVE; PROGRESS. Packet 10bc9361 passes all six actual-host technical checks, including fresh installed-runtime verification; loaded limits and exact terminal journal prove bounded completion. Host checkout 258bae398, issuing source d2f7adaff, restored source 3990df9de are distinguished. All 53 originals/pointer unchanged, active fit 801ef079 retained. Consumer and initial operator run from actual restored source/runtime; weekly diagnostics exactly reproduce. No new spending/provider requests or live activation.
+
+Next: actual Friday September 25 06:00 Pacific cutoff, then qualified handoff and issuing/public/control association before prospective enrollment/E-CAL. Full calibration/conditional-mean, E-VENUE, authentic reviewer, sustained storage-growth and observed live-cycle requirements remain open. Root/artifact headroom snapshots are 3.71/4.02 GB. See SOURCE-DIAGNOSTICS-RECOVERY.md and source-recovery-diagnostics/final-host-*. Confidence medium in overall readiness because future live conditions remain; lower to low on independent integrity/chronology disagreement.
+
 # Latest checkpoint — restored diagnostic release handoff verified
 
 Goal ACTIVE; PROGRESS. Captured initial operator passes on restored source/runtime in 230.780 application / 250.783 service seconds, 256,200,704-byte peak RSS. Stage, activation, exact retry, fourteen Friday-state forecasts and rollback preserve the Thursday fixture lock. All 53 originals/pointer, fifty issuing files and original mounts/namespaces unchanged. No live activation or authority transfer.
