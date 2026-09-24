@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "cca7b0d28cbfe317faa046b9e6e708630f58eb1c7fe600a7fa2832c3512b8fc0",
+  "content_sha256": "57cb8838dc4c1b8293c31741d95da20733e108ad223c7853a4ee7b43cb56f5ea",
   "default_week": 3,
   "game_card_version": "game-card-v3",
   "games": [
@@ -48518,13 +48518,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_03_ATL_GB",
+        "generated_at": "2026-09-24T22:55:29.162716+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "GB",
+        "input_hash": "9512cb59186478f2248a9853fda64ce1700f3aba6fe33640b661194f80855cdf",
         "kickoff_utc": "2026-09-25T00:15:00+00:00",
         "market": {
           "books": {
@@ -48534,12 +48536,36 @@
                 "GB": null
               },
               "spreads": {
-                "ATL": null,
-                "GB": null
+                "ATL": {
+                  "book": "betmgm",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": 100.0,
+                  "side": "Atlanta Falcons"
+                },
+                "GB": {
+                  "book": "betmgm",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Green Bay Packers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 43.0,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 43.0,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -48548,12 +48574,36 @@
                 "GB": null
               },
               "spreads": {
-                "ATL": null,
-                "GB": null
+                "ATL": {
+                  "book": "draftkings",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Atlanta Falcons"
+                },
+                "GB": {
+                  "book": "draftkings",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Green Bay Packers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -48562,12 +48612,36 @@
                 "GB": null
               },
               "spreads": {
-                "ATL": null,
-                "GB": null
+                "ATL": {
+                  "book": "fanduel",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Atlanta Falcons"
+                },
+                "GB": {
+                  "book": "fanduel",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Green Bay Packers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -104.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -118.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -48585,14 +48659,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-24T22:55:12.208980+00:00",
+          "home_win_prob": 0.6586059743954481,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -5.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 44.0
         },
         "model": {
           "spreads": null,
@@ -48601,8 +48676,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-24T23:00:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -49623,54 +49699,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "ATL": "#C3122D",
           "GB": "#03342D"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": 0.0,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 4.5,
+            "pick": "ATL +4.5",
+            "price": 100.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "ATL",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.044151358140995405,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 43.0,
+            "pick": "OVER 43",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -49678,37 +49754,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "GB",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.6586059743954481,
+            "probability_percent": 65.9,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 34.139402560455196,
+            "side": "GB",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "GNB00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 3,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "GB rush offense vs rush defense: #31 vs ATL #10",
+            "ATL rush offense vs rush defense: #25 vs GB #6",
+            "ATL explosive offense vs defense: #20 vs GB #2",
+            "ATL pass offense vs pass defense: #32 vs GB #23",
+            "GB explosive offense vs defense: #8 vs ATL #12"
+          ],
+          "fields": [
+            "6.GB.off_rush_epa;6.ATL.def_rush_epa",
+            "6.ATL.off_rush_epa;6.GB.def_rush_epa",
+            "6.ATL.off_explosive_rate;6.GB.def_explosive_rate",
+            "6.ATL.off_pass_epa;6.GB.def_pass_epa",
+            "6.GB.off_explosive_rate;6.ATL.def_explosive_rate"
+          ],
+          "statement": "The market-based ATS lean favors ATL; GB rush offense vs rush defense: #31 vs ATL #10. Against that lean, ATL rush offense vs rush defense: #25 vs GB #6."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 34.1,
+          "away_width": 34.13940256045519,
+          "home_percent": 65.9,
+          "home_width": 65.8605974395448,
+          "tie_percent": 2.9
         }
       },
       "cutoff_at": "2026-09-24T23:00:00+00:00",
@@ -117101,7 +117190,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-24T09:00:28.373132+00:00",
+  "published_at": "2026-09-24T22:55:34.029594+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
