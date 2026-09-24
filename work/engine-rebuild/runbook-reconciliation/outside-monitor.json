@@ -1,0 +1,73 @@
+{
+  "snapshot_sha256": "b54453de5ed77c6a5bf67b0d91f6d025214a24b41c24628b1be2126c4006f25b",
+  "observed_at": "2026-09-24T00:28:22.817726+00:00",
+  "failure_domain": "Mac: requires awake, connected, logged-in session",
+  "public": {
+    "identity": {
+      "content_sha256": "432340bff21a20d70179efafb7041e78233e6172ff738e1b321faa2829f36805",
+      "games": 48,
+      "published_at": "2026-09-23T23:37:19.982456+00:00"
+    },
+    "state": "VERIFIED",
+    "transport": "curl"
+  },
+  "outside_assessment": {
+    "active": [
+      {
+        "code": "STORAGE_HEADROOM_UNQUALIFIED",
+        "delay_seconds": 0,
+        "details": {},
+        "first_seen": "2026-09-23T14:51:20.217351+00:00"
+      }
+    ],
+    "changed": false,
+    "fingerprint": "a13e274e3eb7f4c0aaf78c87b8cf1fb657f870dc0b0043fe5e6fe5078f9d44f7",
+    "pending": {
+      "STORAGE_HEADROOM_UNQUALIFIED": {
+        "code": "STORAGE_HEADROOM_UNQUALIFIED",
+        "delay_seconds": 0,
+        "details": {},
+        "first_seen": "2026-09-23T14:51:20.217351+00:00"
+      }
+    },
+    "recovered_codes": [],
+    "state": "DEGRADED"
+  },
+  "host_observed_at": "2026-09-24T00:27:24.518049+00:00",
+  "host_final_reader": {
+    "last_success_at": "2026-09-24T00:26:47.981198+00:00",
+    "reason": null,
+    "state": "HEALTHY"
+  },
+  "host_assessment": {
+    "active": [
+      {
+        "code": "STORAGE_HEADROOM_UNQUALIFIED",
+        "delay_seconds": 0,
+        "details": {},
+        "first_seen": "2026-09-22T14:04:22.447670+00:00"
+      }
+    ],
+    "changed": false,
+    "fingerprint": "a13e274e3eb7f4c0aaf78c87b8cf1fb657f870dc0b0043fe5e6fe5078f9d44f7",
+    "pending": {
+      "STORAGE_HEADROOM_UNQUALIFIED": {
+        "code": "STORAGE_HEADROOM_UNQUALIFIED",
+        "delay_seconds": 0,
+        "details": {},
+        "first_seen": "2026-09-22T14:04:22.447670+00:00"
+      }
+    },
+    "recovered_codes": [],
+    "state": "DEGRADED"
+  },
+  "cutoff_state": {
+    "last_cutoff": null,
+    "mode": "NUMERICAL_SHADOW",
+    "next_cutoff": "2026-09-25T13:00:00+00:00",
+    "state": "WAITING_FOR_CUTOFF"
+  },
+  "prospective": {
+    "state": "NOT_ENROLLED"
+  }
+}

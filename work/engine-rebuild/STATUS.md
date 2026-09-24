@@ -1,3 +1,11 @@
+# Latest checkpoint — actual service limits and operator instructions reconciled
+
+Goal ACTIVE; PROGRESS. Installed weekly service had no memory cap/30-minute timeout and daily had twelve minutes; corrected to the standing resource envelope. Daily/learning/cutoff hard-stop at 570 seconds, capture remains 240, learning memory is 4 GiB with zero swap, existing stricter memory limits remain, all numerical services use one CPU/library thread and kill the entire cgroup. Actual Linux stubborn-parent/child timeout fixture verifies termination. Installed bytes, loaded settings, five unchanged active timer definitions, original 52 records/fit pointer and all fifty issuing files verified.
+
+Tier 2 REVIEW REQUESTED: whole-job ceiling includes lock wait/preparation; alternative separate phase supervisors is recorded. Main/initial/runtime runbooks now point to current verified recovery/storage/public access rather than obsolete gaps. Source/fit/control authority unchanged; no new archive/canary, real refit, paid pull, spending or activation. See RUNBOOK-RECONCILIATION.md and runbook-reconciliation/*.json.
+
+Next: actual Friday September 25 06:00 Pacific state, then qualified initial handoff and verified issuing/public/control association before prospective enrollment and E-CAL. Next Tuesday experiment slot remains conditional; no backdated registration. Full calibration/conditional-mean, E-VENUE, authentic method reviews, sustained storage reserve and an observed live cycle remain open. Confidence medium in readiness; lower to low on independent configuration disagreement or inability to meet the actual job budget.
+
 # Latest checkpoint — diagnostic recovery packet verified on actual host
 
 Goal ACTIVE; PROGRESS. Packet 10bc9361 passes all six actual-host technical checks, including fresh installed-runtime verification; loaded limits and exact terminal journal prove bounded completion. Host checkout 258bae398, issuing source d2f7adaff, restored source 3990df9de are distinguished. All 53 originals/pointer unchanged, active fit 801ef079 retained. Consumer and initial operator run from actual restored source/runtime; weekly diagnostics exactly reproduce. No new spending/provider requests or live activation.

@@ -1,0 +1,64 @@
+{
+  "status": "EXPECTED_TIMEOUT_KILLED_STUBBORN_PARENT_AND_CHILD",
+  "unit": "nfl-runbook-timeout-probe.service",
+  "properties": {
+    "TimeoutStartUSec": "2s",
+    "Result": "timeout",
+    "ExecMainCode": "2",
+    "ExecMainStatus": "9",
+    "CPUQuotaPerSecUSec": "1s",
+    "MemoryMax": "67108864",
+    "KillMode": "control-group",
+    "KillSignal": "9",
+    "ActiveState": "failed",
+    "SubState": "failed",
+    "InvocationID": "6ad597637ce54903852fb9f2993dc1a3"
+  },
+  "pids": {
+    "parent": 3863182,
+    "child": 3863183,
+    "uid": 1000
+  },
+  "processes_remaining": {
+    "parent": false,
+    "child": false
+  },
+  "journal": [
+    {
+      "MESSAGE": "Starting nfl-runbook-timeout-probe.service - /opt/nfl-runtime/env/bin/python -B /mnt/nfl-engine-profiles/runbook-timeout-probe.py /mnt/nfl-engine-profiles/runbook-reconciliation/timeout-pids.json...",
+      "MESSAGE_ID": "7d4958e842da4a758f6c1cdc7b36dcc5",
+      "INVOCATION_ID": "6ad597637ce54903852fb9f2993dc1a3",
+      "__REALTIME_TIMESTAMP": "1790209513694964"
+    },
+    {
+      "MESSAGE": "READY",
+      "__REALTIME_TIMESTAMP": "1790209513924941"
+    },
+    {
+      "MESSAGE": "nfl-runbook-timeout-probe.service: start operation timed out. Terminating.",
+      "INVOCATION_ID": "6ad597637ce54903852fb9f2993dc1a3",
+      "__REALTIME_TIMESTAMP": "1790209515740431"
+    },
+    {
+      "MESSAGE": "nfl-runbook-timeout-probe.service: Main process exited, code=killed, status=9/KILL",
+      "MESSAGE_ID": "98e322203f7a4ed290d09fe03c09fe15",
+      "INVOCATION_ID": "6ad597637ce54903852fb9f2993dc1a3",
+      "__REALTIME_TIMESTAMP": "1790209515741347",
+      "EXIT_STATUS": "9"
+    },
+    {
+      "MESSAGE": "nfl-runbook-timeout-probe.service: Failed with result 'timeout'.",
+      "MESSAGE_ID": "d9b373ed55a64feb8242e02dbe79a49c",
+      "INVOCATION_ID": "6ad597637ce54903852fb9f2993dc1a3",
+      "__REALTIME_TIMESTAMP": "1790209515747308"
+    },
+    {
+      "MESSAGE": "Failed to start nfl-runbook-timeout-probe.service - /opt/nfl-runtime/env/bin/python -B /mnt/nfl-engine-profiles/runbook-timeout-probe.py /mnt/nfl-engine-profiles/runbook-reconciliation/timeout-pids.json.",
+      "MESSAGE_ID": "be02cf6855d2428ba40df7e9d022f03d",
+      "INVOCATION_ID": "6ad597637ce54903852fb9f2993dc1a3",
+      "__REALTIME_TIMESTAMP": "1790209515748987"
+    }
+  ],
+  "production_workers_invoked": false,
+  "provider_requests": 0
+}

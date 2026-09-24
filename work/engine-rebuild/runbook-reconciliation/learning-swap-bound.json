@@ -1,0 +1,16 @@
+{
+  "status": "INSTALLED_VERIFIED",
+  "observed_at": "2026-09-24T00:30:54.501170+00:00",
+  "before_sha256": "7b1863393eea95a7be55cf1eb730f6b74b68fd1603ed7480c044dfa08407c6bf",
+  "installed_sha256": "cf35749ed2d2e977e84d49a24a4118b8459a114059f06581292bd0e708ee40d4",
+  "properties": {
+    "TimeoutStartUSec": "9min 30s",
+    "CPUQuotaPerSecUSec": "1s",
+    "MemoryMax": "4294967296",
+    "MemorySwapMax": "0",
+    "KillMode": "control-group",
+    "KillSignal": "9",
+    "LoadState": "loaded"
+  },
+  "qualification": "The 4 GiB learning cgroup cannot add swap beyond its memory budget. Other services retain tighter existing memory plus swap ceilings. No worker invoked."
+}

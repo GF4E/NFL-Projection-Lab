@@ -1,0 +1,96 @@
+{
+  "status": "INSTALLED_VERIFIED",
+  "failure": null,
+  "started_at": "2026-09-24T00:28:43.845867+00:00",
+  "finished_at": "2026-09-24T00:28:44.898158+00:00",
+  "timers_before": {
+    "nfl-engine-capture": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-engine-daily": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-learning": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-cutoff-state": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    }
+  },
+  "timers_after": {
+    "nfl-engine-capture": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-engine-daily": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-learning": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    },
+    "nfl-cutoff-state": {
+      "ActiveState": "active",
+      "UnitFileState": "enabled"
+    }
+  },
+  "before_sha256": {
+    "nfl-engine-capture": "1c2a1fdf8b7cfe058923a38395b23bcacda10e3110354c6c5f39edd0d958aeaa",
+    "nfl-engine-daily": "999f4c1fff3ede32562d467ffe2a8cb2ab237a7bd6ad5e5e38bff5bb9dd2d5e1",
+    "nfl-learning": "6fb3eadd9129a532c62281cc1ca81697b137552475fc13a00c0990b34b42965f",
+    "nfl-cutoff-state": "229c0383fc1c236e564d8a0551c40c5c95f4eb8a000f6e2df167a11bf5680936"
+  },
+  "installed_sha256": {
+    "nfl-engine-capture": "1b21a35cade60c2bace186ccf2a9a25768fe0c4f04e48538f4fd05b4fa42102c",
+    "nfl-engine-daily": "ec9d09038a25f825c9fef434d7951a42258fc2352eb610a7342dcff59a691b6b",
+    "nfl-learning": "7b1863393eea95a7be55cf1eb730f6b74b68fd1603ed7480c044dfa08407c6bf",
+    "nfl-cutoff-state": "c697ac8202d28a1a8c06baf98f041f876924a66a78be8711b971e13280127e30"
+  },
+  "applied": {
+    "nfl-engine-capture": {
+      "TimeoutStartUSec": "4min",
+      "CPUQuotaPerSecUSec": "1s",
+      "MemoryMax": "419430400",
+      "KillMode": "control-group",
+      "KillSignal": "9",
+      "LoadState": "loaded",
+      "DropInPaths": "/etc/systemd/system/nfl-engine-capture.service.d/storage.conf"
+    },
+    "nfl-engine-daily": {
+      "TimeoutStartUSec": "9min 30s",
+      "CPUQuotaPerSecUSec": "1s",
+      "MemoryMax": "419430400",
+      "KillMode": "control-group",
+      "KillSignal": "9",
+      "LoadState": "loaded",
+      "DropInPaths": "/etc/systemd/system/nfl-engine-daily.service.d/storage.conf"
+    },
+    "nfl-learning": {
+      "TimeoutStartUSec": "9min 30s",
+      "CPUQuotaPerSecUSec": "1s",
+      "MemoryMax": "4294967296",
+      "KillMode": "control-group",
+      "KillSignal": "9",
+      "LoadState": "loaded",
+      "DropInPaths": "/etc/systemd/system/nfl-learning.service.d/storage.conf"
+    },
+    "nfl-cutoff-state": {
+      "TimeoutStartUSec": "9min 30s",
+      "CPUQuotaPerSecUSec": "1s",
+      "MemoryMax": "4294967296",
+      "KillMode": "control-group",
+      "KillSignal": "9",
+      "LoadState": "loaded",
+      "DropInPaths": "/etc/systemd/system/nfl-cutoff-state.service.d/storage.conf"
+    }
+  },
+  "protected_records_and_pointer": 53,
+  "originals_unchanged": true,
+  "manual_worker_runs": 0,
+  "provider_requests": 0
+}

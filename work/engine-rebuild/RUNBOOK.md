@@ -1,6 +1,40 @@
-# Rebuild operational runbook — partial implementation
+# Rebuild operational runbook — current operating instructions
 
-The goal remains active. These procedures cover implemented operations only. Full release rollback, always-on outside-host coverage, durable capacity and numerical cadence replay are not certified.
+The goal remains active. Current operating facts below supersede obsolete next-action statements in historical reports; those reports and immutable review snapshots remain preserved. Recovery and same-code handoff/rollback are verified on captured inputs. Actual corrected issuance/control authority, the statistical gates, sustained storage reserve, authentic method reviews and an observed live cycle remain incomplete.
+
+## Current state and next action
+
+Repository of record: `GF4E/NFL-Projection-Lab`, engine-v2, `/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6`. Live owner: `digitalocean:599707390`; service account `nflengine`; interpreter `/opt/nfl-runtime/env/bin/python -B`. Do not invoke a provider worker outside the scheduler owner/dispatch fence.
+
+The current review pointer is `work/engine-rebuild/release-review/current-ref.json`. At this reconciliation it resolves to packet `10bc9361c1b5c16adc16777081c99ba487dfaa3694e5c7c29f09b498cf200344`, restored source `3990df9deb0a01eb26e99c7d5f65c7f1a84bfa86`, issuing source `d2f7adaffe477d954c4fef78be18a1fab1d92829`, and active fit `801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f`. Resolve and verify hashes afresh; neither a version label nor a newer documentation-only Git HEAD establishes a new model.
+
+| Capability | Installed/current state | Next required evidence |
+|---|---|---|
+| Capture, grading, existing report publication | Automatic under current legacy projection path | Continue immutable locks/first grades and matching public bytes |
+| Fri/Mon/Tue 06:00 Pacific state worker | Installed, NUMERICAL_SHADOW; first state Friday September 25 2026 at 13:00 UTC | Actual completed cutoff acknowledgment; no backdating |
+| Corrected scheduled issuance and coupled weekly configuration | Implemented and captured-canary verified; both active pointers absent | Stage/activate exact qualified plan through INITIAL-HANDOFF-RUNBOOK.md after eligible state; independently verify issued/public lineage |
+| Weekly probability diagnostics | Automatic report-only first-grade computation | Preserve exact original calibration, explicit lineage strata and named shortfalls |
+| Prospective paired comparison | Implemented, NOT_ENROLLED | Verified production/control association before actual pre-lock enrollment |
+| E-CAL-LINEAGE, then E-VENUE-DIRECT | No real calibration registration or fitting yet | Authoritative corrected control, Tuesday published closeout and refit, hashed registration, gate and authentic reviews |
+
+Next actual state is Friday September 25 at 06:00 Pacific. Thursday keeps its original legacy lock. A timer definition, simulation or waiting status is not a completed cutoff. Initial stage/activation is an explicit operator action; scheduler recovery resumes only a matching transaction already begun. The first eligible experiment slot is Tuesday September 29, conditional on its closeout/refit and control qualification; do not invent a prior preregistration date. Read INITIAL-HANDOFF-RUNBOOK.md for exact commands and RUNTIME-RECOVERY-RUNBOOK.md for the current recoverable pair.
+
+## Installed schedule and process limits
+
+The timer definitions are observed on the actual host in `runbook-reconciliation/installed-timers.json`. Capture checks due windows every 15 seconds; daily preparation/grading runs hourly; learning is Tuesday 06:00 Pacific; cutoff state is Friday/Monday/Tuesday 06:00 Pacific with a minute catch-up check; the independent host watchdog runs each minute. Timers remain enabled/active and storage mount dependencies are retained. A timer tick is not an additional paid pull: the existing due-window, ownership and provider ledgers still govern requests.
+
+| Service | Hard oneshot start ceiling | Memory cap | Swap cap | CPU quota |
+|---|---:|---:|---:|---:|
+| Capture | 240 seconds | 400 MiB | 1,500 MiB | One CPU |
+| Daily preparation/grading | 570 seconds | 400 MiB | 1,500 MiB | One CPU |
+| Tuesday learning | 570 seconds | 4 GiB | Zero | One CPU |
+| Cutoff state | 570 seconds | 4 GiB | Zero | One CPU |
+
+These numerical services set OPENBLAS, OMP, MKL and NUMEXPR threads to one and retain the shared dispatch fence. A oneshot uses `TimeoutStartSec`; `RuntimeMaxSec=infinity` alone does not mean its startup job is unbounded. Timeout uses SIGKILL on the whole control group, including stubborn descendants. Preserve timeout/partial-write evidence, reconcile the same durable operation and never start a second run because an SSH observation ended. The isolated two-second timeout fixture proves both parent and child are killed; it is not a full workload latency claim.
+
+REVIEW REQUESTED (Tier 2): the daily/learning/cutoff 570-second ceiling includes preparation, lock wait and publication, using the existing canary budget inside ten minutes. A phase-specific supervisor with a longer outer orchestration window is the alternative. Do not silently extend timeouts if a future job fails. Registered experiment workers remain separate, with their own 2,700-second phase ceiling and 4 GiB limit; reports never launch them. The weekly scheduler explicitly disables automatic method promotion.
+
+Before changing a service: preserve its installed bytes, validate the replacement with systemd-analyze, stop only its timer if needed, allow existing work to finish, acquire the real dispatch fence and require the service inactive. Install atomically, reload, inspect loaded limits and restore prior timer states; never manually start capture or learning merely to test the unit. The current installation receipt and exact unit hashes are in RUNBOOK-RECONCILIATION.md.
 
 ## Public final-feed recovery
 
@@ -28,13 +62,15 @@ Other named reasons are ACCESS_RESTORED and STORAGE_RESTORED. Run as the configu
 
 ## Closeout publication
 
-A new-format closeout first commits its snapshot checkpoint, then writes immutable scorecard/trend/season derivatives. Retries resume the checkpoint. Its local PUBLISHED receipt is not sufficient: the acknowledgment must show a verified source-remote commit containing the receipt. Refits and monthly scans check this dependency. This proves source-repository publication, not website rendering; public-site verification remains a separate unfinished requirement.
+A new-format closeout first commits its snapshot checkpoint, then writes immutable scorecard/trend/season derivatives. Retries resume the checkpoint. Its local PUBLISHED receipt is not sufficient: the acknowledgment must show a verified source-remote commit containing the receipt. Refits and monthly scans check this dependency. This proves source-repository publication, not website rendering. The installed curl transport now verifies exact frozen public scorecard/trend/season bytes and retains a separate immutable acknowledgment. The current recovered packet binds the September 22 closeout acknowledgment observed September 23 at 17:50:24 UTC. Every new closeout still requires its own matching live proof before a dependent refit or experiment. See PUBLIC-TRANSPORT.md, BOARD-BYTES.md and outputs/cadence-v2/closeouts/public-acknowledgments.
 
 ## Integrity and capacity
 
 Never rewrite a locked projection or first grade. A conflicting immutable payload fails. On an uncertain write, reconcile the same logical operation and bytes before retrying. Do not delete a pending file owned by another operation or steal its lock.
 
-The root disk remains critically constrained. Package cache removal was temporary recovery only. The prepared 20 GiB volume/migration plan awaits explicit spending and verified-copy-removal authority. No retention changes, artifact deletion or additional paid provider call is authorized by this runbook.
+The approved 20 GiB volume at USD 2/month before tax is installed; the checkout is persistently bound at its original path. Full content copy, off-host restore, rollback/remount and service-user writes were verified. Signup credit was user-reported; its balance/expiration is unverified. Monitor root and artifact filesystems separately, including inodes and write capability. A sample of free bytes is not a sustainable reserve. Daily growth collection is installed; the captured lifecycle observed 36,229,120 allocated bytes at peak on its pinned source, excluding metadata/unobserved transients, Git repack, backup/restore and historical research. See storage-migration-2026-09-23/STORAGE-MIGRATION.md and STORAGE-PROFILE-COMPLETE.md.
+
+Do not delete unique artifacts or broaden retention authority. Only previously authorized, fully verified duplicate/cache removals have occurred. The obsolete expanded source-1c34 and source-76 trees are retired; their standalone archives, private removal manifests and every acceptance receipt remain. Use the current restored source under /mnt/nfl-engine-profiles/source-recovery-diagnostics. Preserve the older source-50 restore and all runtime evidence. Capacity remains STORAGE_HEADROOM_UNQUALIFIED pending growth and the remaining workload reserve, even though disk exhaustion recovered.
 
 ## Independent monitoring
 
@@ -44,7 +80,7 @@ The Mac LaunchAgent `com.gabe.nfl-projection-watchdog` runs every minute, readin
 
 Transient worker failure requires 60 seconds of continuous evidence. Missing locks and integrity failures are immediate. Publication lag allowance is 840 seconds, derived from installed service/cache/observation limits, not a late-issuance allowance. The reader is flagged stale at 900 seconds, adding its normal 60-second poll period. Full-job headroom remains UNQUALIFIED regardless of a positive byte count. An old but identical source/public board is healthy; fresh metadata never substitutes for matching content. See `GAP-SWEEP.md` for the Tier 2 alternatives and detection budgets.
 
-The current unauthenticated website API returns 403. This is `PUBLIC_ACCESS_UNQUALIFIED`, not a website outage finding. That observation channel latches instead of repeating unauthorized requests every minute. Once the endpoint's access is legitimately corrected, explicitly recheck with:
+Current outside-monitor evidence records public bytes VERIFIED using the explicitly configured anonymous curl transport. The earlier urllib 403 and subsequent parse/reserialize hash defect are preserved historical failures, resolved by the qualified transport and byte-preserving reader. No credentials or access-policy change were used. A future PUBLIC_ACCESS_UNQUALIFIED is not automatically a website outage. The denied channel latches rather than repeating requests every minute; only after correcting the named cause, explicitly recheck with:
 
 ```sh
 /opt/anaconda3/bin/python3.12 -B scripts/projection_watchdog.py outside --retry-public
@@ -60,7 +96,7 @@ New cards carry forecast_bundle_ref and release_ref. Resolve them with engine.pr
 
 The scoring child receives one batch of allowlisted values and existing fit/residual parameters, with no inherited credentials and one numerical thread. It reads stdin, imports the existing implementation, then forbids further source file/network/process access while calculating. Failure/timeout propagates; no fallback execution with raw rows. The guard is not a hostile native-code sandbox. Prepared inputs must match their recorded hash and active fit.
 
-Bundles are immutable deterministic gzip records, committed before card references. An unchanged card/input/release retains its previous issued time and bundle. A release manifest records exact code files, last code-changing commit and scorer environment identity; uncommitted issuing code is refused. This does not install archived executables or implement compatible rollback. Do not switch the current-release reference to an old record as a substitute for that unfinished operation.
+Bundles are immutable deterministic gzip records, committed before card references. An unchanged card/input/release retains its previous issued time and bundle. A release manifest records exact code files, last code-changing commit and scorer environment identity; uncommitted issuing code is refused. This bundle alone does not install archived executables or roll back the pipeline. Full restored consumer and initial same-code handoff/rollback are now verified separately in SOURCE-DIAGNOSTICS-RECOVERY.md. Never edit current-release references as a substitute for the fenced, configuration-compatible operation.
 
 Chronology fields explicitly distinguish captured values/hashes from source publication/first-seen/cutoff evidence missing in legacy preparation. Do not call those source vintages verified, or relabel legacy ridge centers as distribution means. Reproduction proves the captured computation; it does not validate all preceding feature construction.
 
@@ -78,7 +114,7 @@ scripts/projection_backup.py pins the already-fetched origin/engine-v2 commit an
 
 Restoration uses a new directory and the local bundle only, with hooks/global Git configuration disabled, no object alternates and no configured remote. It never overwrites an existing restore destination, starts a scheduler, refits or publishes. A failed/interrupted run is not an accepted recovery point; preserve its evidence and inspect the actual process before any restart. The archive file is staged and fsynced before its final name, and receipts use the existing durable writer.
 
-Scope: committed source and artifact history only. Ignored/uncommitted inputs, credentials/ownership state, the installed Linux environment and services, and public-site deployment are excluded. The restored scoring process uses the existing Mac Python runtime; numerical reproduction is not an OS/runtime restoration. Do not use this receipt as authority to remove host originals or to claim a full-host recovery procedure is complete.
+Scope: committed source and artifact history only. Ignored/uncommitted inputs, credentials/ownership state, the installed Linux environment and services, and public-site deployment are excluded. The original backup-restore.json consumer used Mac Python and remains historical evidence. The newer source-recovery-diagnostics evidence executes physically restored Linux source and runtime at their original prefixes; that is same-host executable recovery, not OS, credential, service or whole-machine disaster recovery. Do not use this receipt as authority to remove host originals or to claim a full-host recovery procedure is complete.
 
 Attempts write backup-attempt.json; only a verified restoration writes a new immutable backup-receipts/<hash>.json and updates backup-restore.json. Failed attempts retain the last accepted recovery point. The destination-local .backup.lock is exclusive and nonblocking; LOCAL_BACKUP_ACTIVE performs no archive work. This is local exclusion, not a cross-host ownership transfer.
 
@@ -88,7 +124,7 @@ engine.projection.executable builds a package from an exact release reference an
 
 Restore into a new private directory only. Verify the complete member set and every byte before execution. The isolated child imports from that restored directory, receives only the existing football input contract, and uses the package's own fit/calibration. A mismatched prepared-fit reference, native runtime fingerprint, source member or artifact stops execution with no fallback to the active checkout. The runtime fingerprint covers the interpreter, imported module/cache files, packaged NumPy libraries and, on Linux, mapped native-file bytes. Non-Linux native coverage is explicitly limited; the host test is the production-runtime evidence. Neither fingerprinting nor scorer restoration archives the Linux OS, credentials or services.
 
-work/engine-rebuild/verify_executable_host.py runs candidate fixtures and saved-forecast reproduction under the actual service identity in temporary host storage. It returns verified packages and a receipt to the Mac; it never changes the active release, prepares new inputs, fits, invokes a provider or publishes. Restore qualification is recorded separately from package creation. Full rollback still requires preparation/state, ownership, publication and legacy-record compatibility plus a bounded activation canary. Do not substitute current-release-ref.json edits for those checks.
+work/engine-rebuild/verify_executable_host.py runs candidate fixtures and saved-forecast reproduction under the actual service identity in temporary host storage. It returns verified packages and a receipt to the Mac; it never changes the active release, prepares new inputs, fits, invokes a provider or publishes. Restore qualification is recorded separately from package creation. Compatible rollback requires preparation/state, ownership, publication and legacy-record compatibility. The current captured initial-operator canary verifies that bounded same-code path; cross-version compatibility and an actual live cycle remain separate requirements. Do not substitute current-release-ref.json edits for those checks.
 
 
 ## Prepared-state transaction
@@ -99,7 +135,7 @@ The old current-features.json.gz remains preserved legacy data. New production r
 
 Preparation and weekly_refit share .cloud-private/projection-preparation/writer.lock. Busy means stop; there is no timeout takeover. Cloud dispatch ownership still encloses the job. The current fit must match at both ends of preparation. After a successful weekly refit, the scheduler prepares that fit before republishing; failures preserve the last completed snapshot and do not justify relabeling it as the new fit. A post-pointer response loss is reconciled by reading the exact pointer and retrying the same payload.
 
-Storage failures can leave unreferenced immutable snapshot files; they are preserved evidence, not accepted publication. No automated deletion is introduced. These snapshots plus a verified scorer package support exact restored computation; full preparation/scheduler rollback activation and the observed Tuesday sequence remain separate requirements.
+Storage failures can leave unreferenced immutable snapshot files; they are preserved evidence, not accepted publication. No automated deletion is introduced. These snapshots plus a verified scorer package support exact restored computation; the initial preparation/configuration handoff and rollback now pass in captured restored execution. Actual activation and the observed Tuesday sequence remain separate requirements.
 
 
 ## Scheduled selection capability — not activated
@@ -110,10 +146,10 @@ All groups render before one prepared-pointer commit. A staged immutable group l
 
 ## Preparation-mode release transitions — not activated
 
-engine.projection.pipeline_release retains exact code/environment identity, fit, calibration, immutable prepared checkpoint and scheduled configuration. No active pipeline-releases/active.json is created by normal startup or this source installation. Without one, current production behavior remains legacy. Once a qualified manifest is active, the preparer chooses its mode; manual overrides and incompatible code/fit/configuration fail closed. Weekly refit handoff under an active manifest remains deliberately blocked until separately qualified; therefore do not activate this capability in production yet.
+engine.projection.pipeline_release retains exact code/environment identity, fit, calibration, immutable prepared checkpoint and scheduled configuration. No active pipeline-releases/active.json is created by normal startup or this source installation. Without one, current production behavior remains legacy. Once a qualified manifest is active, the preparer chooses its mode; manual overrides and incompatible code/fit/configuration fail closed. Coupled weekly configuration/training handoff is implemented and captured-canary verified through initial_release. It remains uninstalled until the qualified initial operator runs after the actual eligible cutoff. The operator, not manual pointer edits, enforces this transition.
 
 An explicit same-fit switch acquires the real cloud-dispatch and preparation locks, verifies the current owner, reconstructs the target preparation, records an immutable intent/id, then updates the prepared and active pointers and acknowledges completion. Callers must already have verified remote ownership; this library is not an ownership-transfer CLI. A partial switch blocks dependent work. Correct the cause, retain the same operation ID/target/expected parent, and reconcile; there is no automatic unbounded retry. A changed payload or owner under the same ID, or a replay after another completed transition, fails. Completion-response retries do not overwrite a later compatible preparation.
 
-A target cannot omit currently visible games. Do not roll back state history, alter first grades, restore an old fence or strip cutoff references from locked cards. A same-fit rollback changes future preparation mode and restores its original checkpoint clock; it does not backdate a forecast. New states and original bundles remain readable for grading. Cross-fit, changed-executable/runtime and worker-configuration migrations are unsupported here and need their own compatible release qualification. General rollback remains open.
+A target cannot omit currently visible games. Do not roll back state history, alter first grades, restore an old fence or strip cutoff references from locked cards. A same-fit rollback changes future preparation mode and restores its original checkpoint clock; it does not backdate a forecast. New states and original bundles remain readable for grading. Weekly weight-only refits use the qualified weekly_refit orchestration and its durable switch record. Arbitrary changed-executable/runtime or method migrations still need a compatible release qualification; same-host recovered execution is not whole-machine recovery.
 
 Confidence: medium in release readiness — the bounded transition is supported by captured-input evidence but broader compatibility and a live cycle remain unverified. Lower to low if a real consumer admits a pending/mismatched release or hides a visible game.

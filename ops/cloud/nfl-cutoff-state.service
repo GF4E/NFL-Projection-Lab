@@ -11,8 +11,13 @@ EnvironmentFile=/etc/nfl-engine/secrets.env
 Environment=NFL_RUNNER_ID=digitalocean:599707390
 Environment=OPENBLAS_NUM_THREADS=1
 Environment=OMP_NUM_THREADS=1
+Environment=MKL_NUM_THREADS=1
+Environment=NUMEXPR_NUM_THREADS=1
 ExecStart=/opt/nfl-runtime/env/bin/python -B scripts/cloud_scheduler.py cutoff
-TimeoutStartSec=600
+TimeoutStartSec=570
+KillSignal=SIGKILL
+KillMode=control-group
+CPUQuota=100%
 MemoryMax=4G
 MemorySwapMax=0
 Nice=10

@@ -1,0 +1,30 @@
+{
+  "observed_at": "2026-09-24T00:29:23.338147+00:00",
+  "timers": {
+    "nfl-engine-capture": {
+      "sha256": "a7043d273878b272e67391ce47b5c90b668065ac4568f50f6141fae9aa7f5143",
+      "definition": "[Unit]\nDescription=Check NFL T80/T75 windows every 15 seconds\n\n[Timer]\nOnBootSec=30s\nOnUnitActiveSec=15s\nAccuracySec=1s\nUnit=nfl-engine-capture.service\n\n[Install]\nWantedBy=timers.target\n",
+      "state": "active"
+    },
+    "nfl-engine-daily": {
+      "sha256": "0580993df74cd3d99f011a830714980915b78f6210191d8cf5c8b4cfee72b4d3",
+      "definition": "[Unit]\nDescription=NFL daily job, retaining hourly public-final refresh cadence\n\n[Timer]\nOnCalendar=hourly\nPersistent=true\nAccuracySec=30s\nUnit=nfl-engine-daily.service\n\n[Install]\nWantedBy=timers.target\n",
+      "state": "active"
+    },
+    "nfl-learning": {
+      "sha256": "016093779e745c484426f0ca2ae0076a0d6a32ecb8a59887923e71022980d16f",
+      "definition": "[Unit]\nDescription=Refit Tuesdays at 06:00 Pacific, with DST\n[Timer]\nOnCalendar=Tue *-*-* 06:00:00 America/Los_Angeles\nPersistent=true\nAccuracySec=1s\nUnit=nfl-learning.service\n[Install]\nWantedBy=timers.target\n",
+      "state": "active"
+    },
+    "nfl-cutoff-state": {
+      "sha256": "42bd390c79776270fdb88dd506b3411c6caacaaa0cdbef99020966ee676f9345",
+      "definition": "[Unit]\nDescription=NFL Fri/Mon/Tue 06 Pacific shadow state and bounded catchup\n[Timer]\nOnCalendar=Mon,Tue,Fri *-*-* 06:00:00 America/Los_Angeles\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=1s\nPersistent=true\nUnit=nfl-cutoff-state.service\n[Install]\nWantedBy=timers.target\n",
+      "state": "active"
+    },
+    "nfl-engine-watchdog": {
+      "sha256": "db6658e4e4214e1465751aeb6715862edc22199fc97c4e9bee4599087d17ccd4",
+      "definition": "[Unit]\nDescription=Check NFL worker and outside observer every minute\n\n[Timer]\nOnBootSec=30s\nOnUnitActiveSec=60s\nAccuracySec=1s\nUnit=nfl-engine-watchdog.service\n\n[Install]\nWantedBy=timers.target\n",
+      "state": "active"
+    }
+  }
+}

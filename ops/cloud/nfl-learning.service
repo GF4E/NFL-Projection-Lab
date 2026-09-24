@@ -7,5 +7,13 @@ User=nflengine
 WorkingDirectory=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
 EnvironmentFile=/etc/nfl-engine/secrets.env
 Environment=OPENBLAS_NUM_THREADS=1
+Environment=OMP_NUM_THREADS=1
+Environment=MKL_NUM_THREADS=1
+Environment=NUMEXPR_NUM_THREADS=1
 ExecStart=/opt/nfl-runtime/env/bin/python -B scripts/cloud_scheduler.py learning --host digitalocean:599707390
-TimeoutStartSec=1800
+TimeoutStartSec=570
+KillSignal=SIGKILL
+KillMode=control-group
+MemoryMax=4G
+MemorySwapMax=0
+CPUQuota=100%

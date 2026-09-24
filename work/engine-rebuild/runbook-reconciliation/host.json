@@ -1,0 +1,342 @@
+{
+  "observed_at": "2026-09-24T00:22:43.878230+00:00",
+  "actual_uid": 1000,
+  "host_commit": "c8cb1fcaea4716cdd445c0b217b40d71f5d97618",
+  "issuing_code": {
+    "commit": "d2f7adaffe477d954c4fef78be18a1fab1d92829",
+    "files": {
+      "engine/projection/prospective.py": "32f778b5877b7519257e7d6a3268e335890f1e13c33f257bed6190800ac66fc6",
+      "engine/projection/prospective_worker.py": "48766fcffb8e9d10121fbd93f232348522563b027353e2d58429e687abf099a7",
+      "engine/projection/research_ledger.py": "ea1310c5da238315ff755083b0acb99187fb879f28a0a4cba13de3598e406a8c",
+      "scripts/projection_prospective_collect.py": "ac351f1917a09d7c4721abb6b503b6381f71339fadcbb03dd63e8adb84099a55",
+      "engine/projection/initial_release.py": "3dc52de8ba4ec91da7043d37ae1d1f3cdb2b8c3e0d8554ee5530f4a8eca5af38",
+      "engine/projection/release_preflight.py": "20c8f7dac9c112eb80256866218a4bcfd020c5187027dbd49cc9b5a774cca201",
+      "scripts/projection_initial_release.py": "288894c422b2ac709aee85c41b7c4e8fb236d45f6a51f960ad1b5561650018c3",
+      "engine/projection/runtime_snapshot.py": "77928f5e24df249c99a05a618db01a2f1c23670b5ca46883443b39c42911e230",
+      "engine/projection/executable.py": "81dc00466fa91a3f89d700a74c4dcd8515fa512517344fa0ff47eafab5ca534d",
+      "engine/projection/pipeline_release.py": "40b611ed1caf2f9a7e06492003ef9325fb47621e7844fba74a94ec17728800a8",
+      "scripts/cloud_scheduler.py": "d53c44ace0bf85d5c058b8f6555bac3bc810326663d18041a4a9ccfe7b17d533",
+      "engine/projection/finals.py": "761e1db6f49b50148daacb8c44d322eb865a3a3d27d221aa1145637f816a0c67",
+      "engine/projection/source_archive.py": "c57fd254b478c3b5fcf49e81d043e977d9c126b1c96df2a6b52d4246e8025b5d",
+      "scripts/board_v7_publish.py": "14b30935bcee2a1e046d935010fd04fe8f1f2e5fe247729d702de7056b2c3171",
+      "scripts/board_v9_publish.py": "4c9ab134333935010040ef5d5b43496635f55ae4eee10355db442bf1bc770d4b",
+      "engine/projection/bundle.py": "3e19ed4ff296bbc81bf0e24ce459c0b7a5fc4d99ba75ad97bd55d544dd920f47",
+      "engine/projection/scoring.py": "d8f1b3e4ed2fe94101073c6ac91eeb64509a5791d39e332f1dd1774a4700bdf8",
+      "engine/projection/prepared.py": "7d5fd29f23eafc3122b41a2dc53360c9adfbb5d2346d4cef6713a74b00750ce2",
+      "engine/projection/scoring_process.py": "26384d60b626725cc8b6833850cd88140301ba2f6b0840f94552a8734e0e37a0",
+      "scripts/projection_score_worker.py": "7abb2d3c6e9b9184078ea4ca0bb74e353372d9e47d02904c5ee0f0c22b6705b9",
+      "engine/projection/lineage.py": "10ce918d070d39043a9b0e410b309ac143194bb7af2d59c31001f20f3307976c",
+      "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
+      "engine/projection/training_ledger.py": "195d068b3c7f09104b80304c721b57e72fa1ccbb051ea5e235dcbd1c30510d79",
+      "engine/projection/refit_release.py": "79765976ae1927c1cba6663e544f30e77bf0a00ad5057be89ce4fe2249b94ef2",
+      "engine/projection/weekly_refit.py": "83aed7a9b4d98544506c2c6386f0644c40eeb9dd4cd544f727ef60b93aa1eaf8",
+      "engine/projection/public_closeout.py": "d98aa23ff521bb6a96a080546a4d5e5be42e24655eed520676c3b1d40860d722",
+      "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691",
+      "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+      "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80",
+      "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+      "engine/projection/cutoff_pipeline.py": "dd697227568ff4fbe59542aba9a2457bf3d61ace6b94ca51a29a48f4504915cc",
+      "engine/projection/cutoff_publication.py": "c2839dce949dc5e8b4ce715b6ee0e6d518eede87c3dc2f1023c60cb16aa106e2",
+      "engine/projection/cutoff_selection.py": "5829216b357492b80b478d91b65977218e91cb36bb986521dadcd56c17d28769",
+      "engine/projection/cutoff_worker.py": "39ebebfff38dd08cf9d84e2dfb3fcc6ce2f01160449c927898a161dc8e8ce489",
+      "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+      "engine/projection/card.py": "df962ff1762ce7a0740de60e78ac4d98f65ec5c8b1b546f5d0d191e38ca954de",
+      "engine/projection/grade.py": "1fdbe81249335a3d5492676d03c9749ea46b660a0297506290d18db765904f31",
+      "engine/projection/distribution.py": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec",
+      "engine/projection_v3/card.py": "b545b236035a341a3c6e41c047019a309abf890a3b164f482513611c0ceb4e72",
+      "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+      "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+      "engine/projection_v3/personnel.py": "8f1ec9d1865cac162f7905db6d2c90279795ae24e714b8c17884213651c55af9",
+      "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+      "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+      "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+      "scripts/projection_v3_publish.py": "9dc19759a999123d580bc4d886c6941be2e472f21f79f1721fb2bedb48002ea9",
+      "scripts/projection_prepare.py": "e1341be3cecba533fec3537ade9898a84623c3bdcfd3cec5061ef9fc1e7b9f51",
+      "scripts/projection_v3_prepare.py": "6fa12c601df75c821dc4a457f968e978414811fae8f46347d6d4d725e110cc96",
+      "scripts/projection_v3_sources.py": "e576f1464ce259c30f94ce3fbd121f37d7296209b06c0a08512b962a34d42e96",
+      "scripts/projection_learning.py": "f46df8997a8d7baf7842e17f8f72c9373d46a25e3022047fe9f12ce94aec7dd3"
+    },
+    "environment": {
+      "python": "3.12.2",
+      "implementation": "CPython",
+      "numpy": "1.26.4",
+      "system": "Linux",
+      "machine": "x86_64"
+    },
+    "environment_scope": "Scorer runtime identity, not a fully archived environment"
+  },
+  "packet_ref": {
+    "path": "work/engine-rebuild/release-review/packets/10bc9361c1b5c16adc16777081c99ba487dfaa3694e5c7c29f09b498cf200344.json",
+    "sha256": "10bc9361c1b5c16adc16777081c99ba487dfaa3694e5c7c29f09b498cf200344"
+  },
+  "pointers": {
+    "work/in-season-learning-v1/active-fit-ref.json": {
+      "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+      "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+    },
+    "outputs/projection-v3/pipeline-releases/active.json": null,
+    "work/projection-weekly-refit-v1/configuration.json": null,
+    "work/projection-cutoff-state-v1/worker-config.json": {
+      "body": {
+        "bootstrap_observation_ref": {
+          "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+          "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+        },
+        "created_at": "2026-09-22T20:28:51.031843+00:00",
+        "first_cutoff": "2026-09-25T13:00:00+00:00",
+        "fit_ref": {
+          "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+          "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+        },
+        "method": {
+          "code": {
+            "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+            "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+            "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80",
+            "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+            "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+            "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+            "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+            "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+            "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691"
+          },
+          "elo_hfa": {
+            "2014": 76.21231979030144,
+            "2015": 69.90131578947368,
+            "2016": 60.65303430079155,
+            "2017": 55.15191545574637,
+            "2018": 54.794973544973544,
+            "2019": 62.00396825396825,
+            "2020": 40.033112582781456,
+            "2021": 20.343461030383093,
+            "2022": 14.359637774902975,
+            "2023": 32.369758576874204,
+            "2024": 53.308364544319595,
+            "2025": 54.630788485607006,
+            "2026": 55.131414267834785
+          },
+          "groups": [
+            "calibration",
+            "elo"
+          ],
+          "policy": "approved-method-three-cutoff-v1",
+          "selected": [
+            "none",
+            10
+          ]
+        },
+        "owner": "digitalocean:599707390",
+        "policy": {
+          "cutoff_policy": "Fri/Mon/Tue 06:00 America/Los_Angeles",
+          "max_attempts": 3,
+          "mode": "NUMERICAL_SHADOW",
+          "operation_seconds": 600,
+          "schema": "cutoff-shadow-worker-v1"
+        }
+      },
+      "sha256": "2c6ffe0d516f1d0b508f2573d6df282c2b6df5829555318a730671c2b7ad5f74"
+    },
+    "work/projection-cutoff-state-v1/current-ref.json": null
+  },
+  "cutoff_health": {
+    "state": "WAITING_FOR_CUTOFF",
+    "next_cutoff": "2026-09-25T13:00:00+00:00",
+    "last_cutoff": null,
+    "mode": "NUMERICAL_SHADOW"
+  },
+  "units": {
+    "nfl-engine-capture.service": {
+      "TimeoutStartUSec": "4min",
+      "RuntimeMaxUSec": "infinity",
+      "CPUQuotaPerSecUSec": "infinity",
+      "MemoryMax": "419430400",
+      "WorkingDirectory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "User": "nflengine",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-capture.service",
+      "DropInPaths": "/etc/systemd/system/nfl-engine-capture.service.d/storage.conf"
+    },
+    "nfl-engine-capture.timer": {
+      "TimersMonotonic": "{ OnBootUSec=30s ; next_elapse=30s }",
+      "Persistent": "no",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-capture.timer",
+      "DropInPaths": ""
+    },
+    "nfl-engine-daily.service": {
+      "TimeoutStartUSec": "12min",
+      "RuntimeMaxUSec": "infinity",
+      "CPUQuotaPerSecUSec": "infinity",
+      "MemoryMax": "419430400",
+      "WorkingDirectory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "User": "nflengine",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-daily.service",
+      "DropInPaths": "/etc/systemd/system/nfl-engine-daily.service.d/storage.conf"
+    },
+    "nfl-engine-daily.timer": {
+      "TimersCalendar": "{ OnCalendar=*-*-* *:00:00 ; next_elapse=Thu 2026-09-24 01:00:00 UTC }",
+      "Persistent": "yes",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-daily.timer",
+      "DropInPaths": ""
+    },
+    "nfl-learning.service": {
+      "TimeoutStartUSec": "30min",
+      "RuntimeMaxUSec": "infinity",
+      "CPUQuotaPerSecUSec": "infinity",
+      "MemoryMax": "infinity",
+      "WorkingDirectory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "User": "nflengine",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/nfl-learning.service",
+      "DropInPaths": "/etc/systemd/system/nfl-learning.service.d/storage.conf"
+    },
+    "nfl-learning.timer": {
+      "TimersCalendar": "{ OnCalendar=Tue *-*-* 06:00:00 America/Los_Angeles ; next_elapse=Tue 2026-09-29 13:00:00 UTC }",
+      "Persistent": "yes",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/nfl-learning.timer",
+      "DropInPaths": ""
+    },
+    "nfl-cutoff-state.service": {
+      "TimeoutStartUSec": "10min",
+      "RuntimeMaxUSec": "infinity",
+      "CPUQuotaPerSecUSec": "infinity",
+      "MemoryMax": "4294967296",
+      "WorkingDirectory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "User": "nflengine",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/nfl-cutoff-state.service",
+      "DropInPaths": "/etc/systemd/system/nfl-cutoff-state.service.d/storage.conf"
+    },
+    "nfl-cutoff-state.timer": {
+      "TimersMonotonic": "{ OnBootUSec=30s ; next_elapse=30s }",
+      "TimersCalendar": "{ OnCalendar=Mon,Tue,Fri *-*-* 06:00:00 America/Los_Angeles ; next_elapse=Fri 2026-09-25 13:00:00 UTC }",
+      "Persistent": "yes",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/nfl-cutoff-state.timer",
+      "DropInPaths": ""
+    },
+    "nfl-engine-watchdog.service": {
+      "TimeoutStartUSec": "30s",
+      "RuntimeMaxUSec": "infinity",
+      "CPUQuotaPerSecUSec": "100ms",
+      "MemoryMax": "67108864",
+      "WorkingDirectory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "User": "nflengine",
+      "LoadState": "loaded",
+      "ActiveState": "inactive",
+      "SubState": "dead",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-watchdog.service",
+      "DropInPaths": "/etc/systemd/system/nfl-engine-watchdog.service.d/storage.conf"
+    },
+    "nfl-engine-watchdog.timer": {
+      "TimersMonotonic": "{ OnBootUSec=30s ; next_elapse=30s }",
+      "Persistent": "no",
+      "LoadState": "loaded",
+      "ActiveState": "active",
+      "SubState": "waiting",
+      "FragmentPath": "/etc/systemd/system/nfl-engine-watchdog.timer",
+      "DropInPaths": ""
+    }
+  },
+  "mounts": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6": "/dev/sda[/nfl-engine-data/repo] /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 ext4   rw,noatime,discard",
+    "/mnt/nfl-engine-profiles": "/dev/sda /mnt   ext4   rw,noatime,discard"
+  },
+  "storage": {
+    "/": {
+      "available_bytes": 3708366848,
+      "available_inodes": 1034706
+    },
+    "/mnt/nfl-engine-profiles": {
+      "available_bytes": 4017156096,
+      "available_inodes": 526100
+    }
+  },
+  "recovery": {
+    "source_receipt": {
+      "path": "/mnt/nfl-engine-profiles/source-recovery-diagnostics/source.json",
+      "exists": true,
+      "sha256": "05ccc176044a9993a16ef1ec135dce974e0a90ff57d7f7eb83a1a517b1e9c722"
+    },
+    "source_commit": "3990df9deb0a01eb26e99c7d5f65c7f1a84bfa86",
+    "source_exists": true,
+    "runtime_exists": true,
+    "retired_source_76_exists": false,
+    "retired_source_1c34_exists": false
+  },
+  "protected_records": {
+    "outputs/projection-v3/locks/2026_01_MIA_LV.json": "8cc7875b5899bbd14b875687b00fa9b3536448dd1ef0edb95a3283063057ac61",
+    "outputs/projection-v3/locks/2026_02_PIT_NE.json": "ff1d495bbcccc3f898cd6b3c2a781ad3fa5a102adb5af8601ad2e0b75d04e4a0",
+    "outputs/projection-v3/locks/2026_02_CAR_ATL.json": "344b0cc5f59925b9b84d9ea09de5b763e65e2e6463cbf9c688b287ff0cd30128",
+    "outputs/projection-v3/locks/2026_02_PHI_TEN.json": "ab05f18316136b65f9ad1f9d168035d0f2539eddb2d8670413a7df82c5e28b41",
+    "outputs/projection-v3/locks/2026_01_GB_MIN.json": "b47351d1b422ea3da2865dfa1056637e37e12e54f4c372a442f8c309495bca40",
+    "outputs/projection-v3/locks/2026_01_WAS_PHI.json": "4833ac25e2075fcc15664e652c656263b26369c3166a03a48bfd6ca000675058",
+    "outputs/projection-v3/locks/2026_02_DET_BUF.json": "30fa21e828a365f4bd6e949d76a21f706521ef0991cd12ecebdc549334e8737f",
+    "outputs/projection-v3/locks/2026_02_SEA_ARI.json": "c5573043478bf3b4156d1cd311bcc3541b738e1c320abbe9855bb5973ad77372",
+    "outputs/projection-v3/locks/2026_02_NYG_LA.json": "92ed3d8aee7e7300c4957d05f3ed985d0cbc2d3bd7af4ce263ee34c88b2cf950",
+    "outputs/projection-v3/locks/2026_01_ARI_LAC.json": "4fda92e9cf9583c03cb6c859b4b9018764aeb6cdf1e45757aab7d58afcefba7a",
+    "outputs/projection-v3/locks/2026_01_DEN_KC.json": "f83b3b068f8ea68c5dea2c4d31782e01b83a603089b53611d62332494aa67603",
+    "outputs/projection-v3/locks/2026_02_GB_NYJ.json": "c8781adc86da62320f39418f09381a97cacf733de326e11fdb1855675b468d25",
+    "outputs/projection-v3/locks/2026_01_DAL_NYG.json": "cd506f1f4054a5c78e62f93cc96d9875a1268fe9753e8376dbfff44d0524481e",
+    "outputs/projection-v3/locks/2026_02_WAS_DAL.json": "dd299e79b303c0adb977c706c2cb41aab75303a29a0ca8b65ddb9f1c0ebba1b7",
+    "outputs/projection-v3/locks/2026_02_JAX_DEN.json": "721263bcc790a37c281ad8927fc0d476fc53baddc589423e1455b976850ce485",
+    "outputs/projection-v3/locks/2026_02_CIN_HOU.json": "c7d84dab17b0474bcd0c82fff88b8ed9bf724863c255d772b67fe100ec442fe4",
+    "outputs/projection-v3/locks/2026_02_MIN_CHI.json": "d4e128ca8f6954e4d4055b9b7ff5a3c8548ad6b431ba71931d0107eb96abaa0d",
+    "outputs/projection-v3/locks/2026_02_MIA_SF.json": "c262970c5612969a8653c017ba14424ecee755347678f6e69316b1e86e1db32b",
+    "outputs/projection-v3/locks/2026_02_NO_BAL.json": "4f0b2425cc8d355b8120124bbf2334ec0dd477d80654fe20d5f370f9aef05a31",
+    "outputs/projection-v3/locks/2026_02_CLE_TB.json": "37e707297e70b89aad7e802d661c52baff552d517ebb32cbd11f80211ecf770f",
+    "outputs/projection-v3/locks/2026_02_IND_KC.json": "24dbf22f3bf42ac35c7603140fff0c3939d9403b02a177e00a98f5134e1f0d9f",
+    "outputs/projection-v3/locks/2026_02_LV_LAC.json": "02935486e0efa95967f997ed688547f9513edcf05eaefa902d1c9c455638dc86",
+    "outputs/projection-v3/grades/2026_01_NO_DET.json": "e59033a887fae8c1b0de61c002ebe16c2ad3298c66a311eb1ca42f541e00e3d9",
+    "outputs/projection-v3/grades/2026_01_MIA_LV.json": "e743a3fd9ab2462a386554af88b2c7f49728a97af2bb265040cb90b23b8f2734",
+    "outputs/projection-v3/grades/2026_02_PIT_NE.json": "8e161d7a17bf244be953c4d10b2521d9a0189dd378e7fd6fbff3cb22efd5375f",
+    "outputs/projection-v3/grades/2026_01_CHI_CAR.json": "431439e2d5dafe5fd95832e25ab43130fc72f7b32475b62ec1d754cb90d21ccc",
+    "outputs/projection-v3/grades/2026_02_CAR_ATL.json": "70a0c998721565e50243b4dddfd325665c8534885b465b9923a58d173671b006",
+    "outputs/projection-v3/grades/2026_02_PHI_TEN.json": "3b01dd2f79219097e021777933eb0fc03914381a8654e2301e1bf5b33fba3ba4",
+    "outputs/projection-v3/grades/2026_01_GB_MIN.json": "6a7de0413ef0aff8403c112a99b47df39604e7aed764cc2373b18a471a97d1ab",
+    "outputs/projection-v3/grades/2026_01_WAS_PHI.json": "578676736535802a8f756ac3ed2c8c95cfd4c582cd370eb96652860f056c669a",
+    "outputs/projection-v3/grades/2026_01_NYJ_TEN.json": "da87958d639487a4d1f3ea51cc374987e64c736eb0796c7ad2be84a8bc187f8e",
+    "outputs/projection-v3/grades/2026_02_DET_BUF.json": "6c43b315b04fb19a6abcdc3af42d60ce40d501cb718f83865cdcdc6b6b8d94f8",
+    "outputs/projection-v3/grades/2026_02_SEA_ARI.json": "77637dfdcfb3bb8d151e09495ebfe00e172a57c5f1d842e4630cc0c71cc39d12",
+    "outputs/projection-v3/grades/2026_02_NYG_LA.json": "a59a2277d0eaf5d874b37c1a81b3881bb5c29e7e48750526a47ba43c7c2f200a",
+    "outputs/projection-v3/grades/2026_01_ARI_LAC.json": "b7bfc4fdb46d4c2f0ea1c2605237d5ee3a6ad534942ef10a794fff7529f9f154",
+    "outputs/projection-v3/grades/2026_01_DEN_KC.json": "bb89c7e7276db0415ea11dd001cd0fcb249d677b484154dfcc766c160cb457f4",
+    "outputs/projection-v3/grades/2026_02_GB_NYJ.json": "9c24ca04595143a9b11d8875243f9ac6b2aaa1e5d499d4fc58d6a4b60136e6aa",
+    "outputs/projection-v3/grades/2026_01_DAL_NYG.json": "63b7228ae260682b86176138238e655b950dd786c158220945aac7be3ac7dbac",
+    "outputs/projection-v3/grades/2026_02_WAS_DAL.json": "cf92b3f6abfa2d95182e5ae60144d98a65e19211bc26cbeb42419383d7a76592",
+    "outputs/projection-v3/grades/2026_02_JAX_DEN.json": "8a52cf640ccef46f604316e07b97b2d667eabd9f50bc446e1c739bc7ce361b6b",
+    "outputs/projection-v3/grades/2026_02_CIN_HOU.json": "5065ce4f2ce6a9708b4ca3d5f0a5c6effd6b84bc23909ef9f45c5f97324ef66b",
+    "outputs/projection-v3/grades/2026_01_BUF_HOU.json": "b288d7fb4d483a949da7b2a3e91e6f7af5914dcdfde11ae79bec8704e98e6da2",
+    "outputs/projection-v3/grades/2026_02_MIN_CHI.json": "b8e3d4e99f1c1ec2195c9632ed3e37d3672889650caf6a7b15cdd0c94eef870f",
+    "outputs/projection-v3/grades/2026_02_MIA_SF.json": "43500034d48990108390212551584ac7e6c0d0c11d77bd56e188d1eddb302ae7",
+    "outputs/projection-v3/grades/2026_02_NO_BAL.json": "49acae03e97bb041f0fcd3c56108df5a07462c3913189aa19f1333e2e518d865",
+    "outputs/projection-v3/grades/2026_01_TB_CIN.json": "6cc1d5e5012bfa9fc4c4bfa90af628788488129345dc4f8f6fe9aab2bbc0a057",
+    "outputs/projection-v3/grades/2026_01_CLE_JAX.json": "1525706739405eb0ff67ebba88c9c2178e68b7fb60bc09cde2cf51bdb140163f",
+    "outputs/projection-v3/grades/2026_02_CLE_TB.json": "c61bd6df755ca46f0c9bd70ef31250b53f9e205809550de53d837ee441182f58",
+    "outputs/projection-v3/grades/2026_01_ATL_PIT.json": "191088578b71968b7ecf80cffd745f50cbbe6cb80c981ebc3e762a82141fba3a",
+    "outputs/projection-v3/grades/2026_01_BAL_IND.json": "9cf2650e32d7ee36066507e6626cd38246bcffed22b02555be18bb17743a7c87",
+    "outputs/projection-v3/grades/2026_02_IND_KC.json": "756b760708dce32f7b871fe6cb030304ac0a409b109e5da8a4f83d2ae90dd091",
+    "outputs/projection-v3/grades/2026_02_LV_LAC.json": "1e925bc7f5345105ea140f2db492018a2b993f106a4ba4a61b78dc16a032468b"
+  },
+  "writes": false,
+  "provider_requests": 0
+}
