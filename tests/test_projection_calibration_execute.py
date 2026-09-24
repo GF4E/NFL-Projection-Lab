@@ -48,6 +48,17 @@ class ExecutionTests(Base):
             self.execute()
         worker.assert_not_called();self.assertEqual(before,self.snapshot())
 
+    def test_mean_contract_diagnostics_do_not_change_results_or_add_a_gate(self):
+        saved=self.execute();before=copy.deepcopy(saved)
+        with patch.object(evaluator,'run',side_effect=AssertionError('report attempted fit')):
+            text=report.render(saved,report.diagnostics(self.root,None,self.r['baseline_hash']))
+        self.assertEqual(saved,before)
+        self.assertIn('Expected-score contract diagnostics (not an E-CAL gate)',text)
+        self.assertIn('JOINT_EVIDENCE_MISSING',text)
+        self.assertIn('CONTRIBUTION_EVIDENCE_MISSING',text)
+        self.assertEqual(a.GATE['primary'],'team_points_CRPS')
+        self.assertNotIn('mean_contract',a.GATE)
+
     def test_active_local_lock_does_not_steal_or_fit(self):
         lockpath=x.directory(self.root)/'.worker.lock';storage.write_bytes(lockpath,b'',immutable=True)
         with lockpath.open('r+') as lock:

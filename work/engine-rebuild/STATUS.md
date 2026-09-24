@@ -1,3 +1,9 @@
+# Latest checkpoint — executable mean-contract diagnostics qualified
+
+Goal ACTIVE; previous turn PROGRESS. Added a pure read-only expected-score checker and integrated named shortcomings into retained calibration reports without changing E-CAL's gate. It requires actual joint evidence before claiming coherence, keeps means/medians and strict wins/tie-split scores distinct, checks support/intervals/contributions, and never repairs a forecast. Fifteen focused tests pass; broad run 641 tests passes with three platform skips (before one final extra boundary fixture). All 48 preserved captured forecasts match the independent audit; all capture hashes and fifty issuing files unchanged. Full-size retained synthetic report completes in 5.155 seconds without fitting or changing 45 native files. See MEAN-CONTRACT.md; initial harness identity failure is preserved separately.
+
+The checker is not live issuance enforcement or an actual mean migration. E-CAL prerequisites and gate remain intact. RAM choice remains pending; no new stress run, spending or provider call. Next: proceed with the selected bounded research capacity once authorized and preserve Friday live cutoff, initial handoff/issuing/public/control association, Tuesday published closeout/refit/registration, calibration/conditional-mean/E-VENUE dispositions, actual reviewers, sustained storage and observed-cycle requirements. Full objective remains active and unfulfilled.
+
 # Latest checkpoint — full calibration readback optimized; capacity decision prepared
 
 Goal ACTIVE; previous turn PROGRESS. A per-result immutable-string pool reduces isolated read peak by 16.12 MB and full-workflow sampled peak by 34.08 MB on Mac. Complete synthetic execution/ledger/exact retry/report passes in 35.057 seconds with the same 2,639-game/40-bank numerical hash. All fifty issuing files remain unchanged; 103 focused and 626 projection tests pass, three platform skips. See CALIBRATION-READBACK.md.

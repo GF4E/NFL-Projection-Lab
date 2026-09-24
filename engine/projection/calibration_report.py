@@ -2,10 +2,13 @@
 import hashlib
 import json
 import statistics
+from collections import Counter
 from pathlib import Path
 from engine.projection_experiments import digest
 from scripts.reference_lines import render as render_reference_lines
 from . import calibration_execute as execution, calibration_admission as admission, storage, research_ledger
+from . import mean_contract
+from .distribution import pmf
 
 REVIEW='REVIEW REQUESTED — maximum three explicit execution attempts; alternative: retries until the experiment deadline. This is an operational limit, not a statistical gate.'
 QUESTIONS=[
@@ -40,6 +43,24 @@ def diagnostics(root,reference,baseline_hash):
         if audit and not (audit.get('reporting_only') and audit.get('never_a_gate') and audit.get('never_a_selection_criterion')):
             raise ValueError('Diagnostic must never select a model')
     return report
+
+
+def mean_contract_evidence(result):
+    """Descriptive acceptance shortcomings, never an additional E-CAL gate."""
+    rows=[]
+    probability_fields=('home_strict_win_probability','away_strict_win_probability',
+                        'tie_probability','home_win_probability','away_win_probability')
+    for arm in ('control','candidate'):
+        counts=Counter()
+        for record in result['records']:
+            f=record['forecasts'][arm];shapes=result['banks'][f['calibration_sha256']]['shapes']
+            masses={k:pmf(shapes['team_points' if k.endswith('_points') else k],f[k])
+                    for k in mean_contract.TARGETS}
+            check=mean_contract.assess({k:f[k] for k in mean_contract.TARGETS},masses,
+                intervals=f['intervals'],probabilities={k:f[k] for k in probability_fields})
+            counts.update(check['violations'])
+        rows.extend([arm,name,n] for name,n in sorted(counts.items()))
+    return rows
 
 
 def render(saved,diagnostic):
@@ -102,6 +123,9 @@ def render(saved,diagnostic):
         lines+=['## Forecast meaning and score support',
             'Point labels remain LEGACY_RIDGE_CENTER. Distribution means are not relabeled as those points. Negative team/total support is retained and disclosed, not clipped. Winner probabilities refer to strict wins plus half the tie mass.',
             table(['Arm','Target','Mean distribution-minus-point','Largest absolute offset','Mean negative-score mass'],meaning)]
+        lines+=['Expected-score contract diagnostics (not an E-CAL gate):',
+            'Arithmetic tolerance 1e-10; CDF boundary tolerance 1e-14. Separate marginals cannot establish a joint score distribution. Missing contribution evidence here means the calibration result does not retain point-model tables, not that the issuing model lacks them. This checker never changes scores or supplies release approval.',
+            table(['Arm','Named shortfall','Games'],mean_contract_evidence(result))]
         lines+=['## Calibration executions',table(['Hash','Target season','Cadence','Donor relation','Donor games','Fitted at'],
             [[key,b['target_season'],b['cadence'],b['relation'],len(b['expected_game_ids']),b['fitted_at']]
              for key,b in sorted(result['banks'].items())]),

@@ -33,7 +33,7 @@ EVALUATOR_CODE=('engine/projection/calibration_admission.py','engine/projection/
                 'engine/projection/calibration_execute.py','engine/projection/storage.py',
                 'scripts/projection_calibration.py','engine/projection/research_ledger.py',
                 'engine/projection/calibration_report.py','engine/projection/calibration_json.py',
-                'engine/projection/calibration_result.py')
+                'engine/projection/calibration_result.py','engine/projection/mean_contract.py')
 
 
 def environment():

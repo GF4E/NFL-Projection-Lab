@@ -1,0 +1,27 @@
+# Expected-score contract: executable acceptance evidence
+
+This work adds an acceptance checker, not a corrected forecast model. The legacy model and its archived forecasts remain unchanged. No experiment is registered, fitted, promoted or rejected.
+
+`engine/projection/mean_contract.py` checks the distinction between a point estimate and a distribution mean; total/margin mean identities; nonnegative integer team/total support; normalized probabilities; strict wins, ties and separately labeled tie-split scores; central inclusive intervals and nesting; contribution sums and inactive contributions. An explicit joint score distribution must reproduce all four marginal distributions before joint coherence can be claimed. Missing joint evidence is reported as NOT_ESTABLISHED, not asserted incompatibility. The checker never assumes independence or forces the mean-score leader to win more than half the time.
+
+`assess` returns named shortcomings without altering inputs. `require_expected_score_contract` rejects an explicit future mean-contract claim if any prerequisite is missing. Passing its arithmetic does not prove that a fitted model estimates the true conditional mean accurately; that still requires chronological accuracy/calibration evidence. Nonnegative integer support is necessary, not a complete model of possible football scoring paths.
+
+## Verification and actual limits
+
+- 15 focused tests cover valid joint distributions, skewed mean/winner disagreement, median non-additivity, identical means with incompatible joint evidence, negative support, malformed probabilities, missing contributions, inactive terms, probability-event mistakes, interval changes, input-order invariance, mutation protection and rejection of unrelated actual/market fields in the point contract.
+- The broad projection run passes 641 tests, with three Linux-only skips. It completed before the final additional input-boundary test; the subsequent 15-test focused run includes that test. No larger broad-test count is claimed.
+- All 48 September 22 captured cards pass their existing arithmetic checks but fail the proposed expected-score contract, agreeing with the earlier independent FORECAST-CONTRACT audit. This is a new executable acceptance check on the preserved capture, not fresh deployment evidence or a new statistical finding. The capture contains 30 graded AS_ISSUED games, two separately labeled retrospective games and sixteen then-upcoming Week 3 forecasts; they are not pooled as prospective accuracy evidence.
+- Saved margin/total bands, tie-split probabilities and original contributions reproduce. Strict probabilities and team intervals are separately identified as derivatives reconstructed from the original residual counts. All captured-file hashes and all fifty frozen issuing files are unchanged.
+- The retained full-size synthetic 2,639-game calibration report now includes named contract shortcomings for both arms. Report generation completed in 5.155 seconds with fitting patched to fail if invoked; all 45 native request, bank, attempt and result files retain their hashes. Numerical gate reasons and forecasts are unchanged. The report explicitly says these diagnostics are not an additional E-CAL gate.
+
+The first retained-report harness invocation confused the registration file hash with the registration body's experiment key. It failed before reading an attempt or writing a report. The exact failure is retained in `mean-contract-retained-report.log`; the corrected explicit body-key invocation and successful receipt are retained separately. This is a harness correction, not an experiment retry or refit.
+
+## Integration and remaining work
+
+Calibration reports call the checker; future E-CAL code bindings include the new module. The numerical evaluator and its existing one-candidate CRPS gate are unchanged. Frozen historical registrations/results are not rehashed or rewritten. The checker is **not installed in live issuance or release activation**; doing so before a qualified statistical migration would incorrectly reject the deliberately retained legacy model. A future release that claims expected scores must supply its joint and contribution evidence and call the strict check as part of its release qualification. Actual calibration/mean migration, reviewer decisions and live-cycle proof remain open.
+
+CONVENTIONS: Tier 1 follows linearity of expectation and the existing discrete CDF/tie conventions. Tier 2 REVIEW REQUESTED: 1e-10 absolute arithmetic tolerance plus the existing 1e-14 CDF boundary convention, rather than exact float equality. These values are explicit in every assessment and do not change the statistical experiment gate. No centering, clipping, parameter, feature, distribution family or candidate is introduced.
+
+Evidence: `MEAN-CONTRACT-PLAN.md`, `qualify_mean_contract.py`, `mean-contract-qualified.json`, `mean-contract-retained-report.json`, and `tests-mean-contract*.log`. No paid-provider calls, new spending or live publication occurred in this increment. The separate RAM approval remains pending.
+
+Least certain: the statistical design that will eventually satisfy the expected-score contract without harming forecast quality; this checker does not select it. Confidence: near-total in the verified captured arithmetic, meaning reproducible arithmetic and hashes on verified rows. Lower to high if independent reconstruction changes a band, probability, contribution or source identity. Predictive improvement and live enforcement remain unproved.

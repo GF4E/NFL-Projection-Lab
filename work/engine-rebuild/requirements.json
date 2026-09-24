@@ -529,7 +529,12 @@
         "audit_forecast_contract.py; forecast-contract-audit.json; tests/test_projection_contract_audit.py (independent counts, probabilities, bands, contributions and control metrics; invalid support and legacy mean mismatch explicitly unresolved)",
         "FORECAST-CONTRACT.md (current and target semantics; no numerical migration or improved accuracy claimed)",
         "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)",
-        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)",
+        "MEAN-CONTRACT.md",
+        "engine/projection/mean_contract.py",
+        "tests/test_projection_mean_contract.py",
+        "mean-contract-qualified.json",
+        "mean-contract-retained-report.json"
       ]
     },
     {
@@ -563,7 +568,12 @@
         "calibration-memory/linux-banks-terminal.json",
         "CALIBRATION-READBACK.md",
         "RESEARCH-CAPACITY-CHOICE.md",
-        "calibration-memory/shared-pool-parity.json"
+        "calibration-memory/shared-pool-parity.json",
+        "MEAN-CONTRACT.md",
+        "engine/projection/mean_contract.py",
+        "tests/test_projection_mean_contract.py",
+        "mean-contract-qualified.json",
+        "mean-contract-retained-report.json"
       ]
     },
     {
@@ -922,7 +932,12 @@
         "diagnostic-qualification/host-installed-attempt2.json (actual normal scheduled publication equals captured verified diagnostics; 53 host/local originals unchanged)",
         "SOURCE-QUALIFIED-RECOVERY.md; source-recovery-qualified/accepted-journal.json; initial-operator-accepted.json; release-review/current-ref.json (a8c70111 binds fully restored frozen diagnostic source and captured handoff; actual-host/live qualification remain separate)",
         "source-recovery-qualified/final-host-preflight.json; final-host-supervision.json; document-refresh.json (d7e4d6ae six actual-host technical checks; same technical evidence/current runbook; 53 originals unchanged; real cutoff/handoff remains pending)",
-        "CALIBRATION-SCALE.md; calibration-scale/verification.json; journal-attempt1.jsonl; host-capacity-guard.txt (full-size synthetic canary failed at tightened 256 MiB cgroup limit; no numerical result or gate; actual host has 458 MiB physical RAM; preserves failed attempt and requires memory qualification)"
+        "CALIBRATION-SCALE.md; calibration-scale/verification.json; journal-attempt1.jsonl; host-capacity-guard.txt (full-size synthetic canary failed at tightened 256 MiB cgroup limit; no numerical result or gate; actual host has 458 MiB physical RAM; preserves failed attempt and requires memory qualification)",
+        "MEAN-CONTRACT.md",
+        "engine/projection/mean_contract.py",
+        "tests/test_projection_mean_contract.py",
+        "mean-contract-qualified.json",
+        "mean-contract-retained-report.json"
       ]
     },
     {
