@@ -1,3 +1,9 @@
+# Latest checkpoint — frozen source handoff verified; final host check next
+
+Goal ACTIVE; PROGRESS. Captured initial operator runs on fully restored source/runtime in 197.875 application / 206.161 service seconds, peak RSS 317,460,480 bytes. Thursday lock survives, boundary extends to 2,928 training games, fourteen Friday-state forecasts issue, exact retry and rollback pass. All fifty issuing files and 53 original records/pointer remain unchanged. Packet a8c70111 binds the evidence; five local checks pass, actual-host runtime admission follows. No live activation or revised control authority.
+
+Next: final host preflight, then first actual Friday September 25 06:00 Pacific cutoff and qualified live handoff/issuing/public/control association. Keep source frozen. Original calibration/mean/venue, authentic review, sustained-capacity and live-cycle requirements remain open. No new provider requests or spending. Confidence medium in readiness; lower to low on independent integrity/chronology disagreement.
+
 # Latest checkpoint — frozen source restored and consumer verified
 
 Goal ACTIVE; PROGRESS. Full source e14390e56 / archive bce8ac85 restores all 13,504 entries / 2,976,662,468 bytes; both existing runtimes reverify manifest 421443b2. Restored consumer reproduces 16 forecasts, 32 grades and qualified thirty-game diagnostics, plus complete captured refit/locks/grades/retry/rollback in 173.948 application / 175.098 service seconds. All 53 originals/pointer, original mounts/namespaces/native files unchanged. Obsolete expanded source-50 cache retired only after archive/full-tree verification; all archives/receipts retained, 3.56 GB recovered.
