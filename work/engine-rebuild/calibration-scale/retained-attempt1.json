@@ -1,0 +1,314 @@
+{
+  "scope": "SYNTHETIC_ONLY_NOT_AN_EXPERIMENT",
+  "identity": {
+    "scope": "SYNTHETIC_ONLY_NOT_AN_EXPERIMENT",
+    "root": "/mnt/nfl-engine-profiles/calibration-scale-20260924/attempt1/tmp9omindcr",
+    "registration_ref": {
+      "path": "work/registration.json",
+      "sha256": "7acb1eeb8d1267287a53cf1a3b01d3d931a0e9274589884826905de7a2c2ebd3"
+    },
+    "input_ref": {
+      "path": "work/inputs.json",
+      "sha256": "582ec3708c2496b9f8fffb17a9ad22f957928b76e3c36093d6ab3e73e0ec1873"
+    },
+    "code": [
+      {
+        "path": "engine/projection/calibration_admission.py",
+        "sha256": "dd3c81965ba11bd2b882e19f399ec925504388994ae268be8f50289575c20759"
+      },
+      {
+        "path": "engine/projection/calibration_evaluate.py",
+        "sha256": "489fe4473c0aaf78dfbaf38c989b846e7478fd3eeee2c7e4efaf887677cc0409"
+      },
+      {
+        "path": "engine/projection/calibration_history.py",
+        "sha256": "35b8090f3203759426b26045aebab8087f9cd8e88378af9f0be17816dc6cfe41"
+      },
+      {
+        "path": "engine/projection/distribution.py",
+        "sha256": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec"
+      },
+      {
+        "path": "engine/projection/model.py",
+        "sha256": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead"
+      },
+      {
+        "path": "engine/scoring.py",
+        "sha256": "288bd49f4d44893023a5b1667c92004ff99f7ada28bc336be45ba7a1093565dd"
+      },
+      {
+        "path": "engine/projection_v3/qualify.py",
+        "sha256": "ea0d7385dbb97a3730b3a6c3e0d62041b157a1c19155ab96585eb1b11a7a58d2"
+      },
+      {
+        "path": "engine/projection_experiments.py",
+        "sha256": "869044f2abaf079a9f317a25fdb6e69fd61b037ffddca3a6ecea2fd1b7a3c8f3"
+      },
+      {
+        "path": "engine/forecast_system/calendar.py",
+        "sha256": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b"
+      },
+      {
+        "path": "engine/projection/calibration_execute.py",
+        "sha256": "51557cc34dd347ae7abaae5d5f0dd647bbb58970a97f714bd6457dbb692d02e4"
+      },
+      {
+        "path": "engine/projection/storage.py",
+        "sha256": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f"
+      },
+      {
+        "path": "scripts/projection_calibration.py",
+        "sha256": "440266722826de4a23c3094db34466546ebb59d7f4c8d249840c3cb8ec1ba805"
+      },
+      {
+        "path": "engine/projection/research_ledger.py",
+        "sha256": "ea1310c5da238315ff755083b0acb99187fb879f28a0a4cba13de3598e406a8c"
+      },
+      {
+        "path": "engine/projection/calibration_report.py",
+        "sha256": "f841f02c941f73b68f379301bb719a9bee0640c74393f3bae76ed506f5c9e213"
+      }
+    ],
+    "environment": {
+      "python": "3.12.2",
+      "numpy": "1.26.4",
+      "scoringrules": "0.10.0"
+    },
+    "history_games_per_arm": 3407,
+    "evaluation_games": 2639,
+    "warmup_games": 768,
+    "outer_seasons": 10,
+    "fit_manifest_counts": {
+      "own": 226,
+      "legacy": 13
+    },
+    "training_memberships": {
+      "own": 383155,
+      "legacy": 20126
+    },
+    "synthetic_receipts": true,
+    "real_experiment_registered": false,
+    "production_evidence_read_forbidden": true,
+    "activates_method": false
+  },
+  "files": [
+    {
+      "path": "identity.json",
+      "bytes": 2991,
+      "sha256": "fc4a2e57fc9a84e814ce61d2370a497f4ff302dba2445e8729a5132868f8cb2a"
+    },
+    {
+      "path": "tmp9omindcr/config/projection-closeout-publication.json",
+      "bytes": 91,
+      "sha256": "2b21c222e57d28b789f7ecd5c5ed20a3a68b345e62e6937248ac29293b4c0dd3"
+    },
+    {
+      "path": "tmp9omindcr/engine/forecast_system/calendar.py",
+      "bytes": 3907,
+      "sha256": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/calibration_admission.py",
+      "bytes": 12097,
+      "sha256": "dd3c81965ba11bd2b882e19f399ec925504388994ae268be8f50289575c20759"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/calibration_evaluate.py",
+      "bytes": 13070,
+      "sha256": "489fe4473c0aaf78dfbaf38c989b846e7478fd3eeee2c7e4efaf887677cc0409"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/calibration_execute.py",
+      "bytes": 11920,
+      "sha256": "51557cc34dd347ae7abaae5d5f0dd647bbb58970a97f714bd6457dbb692d02e4"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/calibration_history.py",
+      "bytes": 9417,
+      "sha256": "35b8090f3203759426b26045aebab8087f9cd8e88378af9f0be17816dc6cfe41"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/calibration_report.py",
+      "bytes": 11055,
+      "sha256": "f841f02c941f73b68f379301bb719a9bee0640c74393f3bae76ed506f5c9e213"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/distribution.py",
+      "bytes": 2135,
+      "sha256": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/model.py",
+      "bytes": 3000,
+      "sha256": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/research_ledger.py",
+      "bytes": 7584,
+      "sha256": "ea1310c5da238315ff755083b0acb99187fb879f28a0a4cba13de3598e406a8c"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection/storage.py",
+      "bytes": 2978,
+      "sha256": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection_experiments.py",
+      "bytes": 7321,
+      "sha256": "869044f2abaf079a9f317a25fdb6e69fd61b037ffddca3a6ecea2fd1b7a3c8f3"
+    },
+    {
+      "path": "tmp9omindcr/engine/projection_v3/qualify.py",
+      "bytes": 13237,
+      "sha256": "ea0d7385dbb97a3730b3a6c3e0d62041b157a1c19155ab96585eb1b11a7a58d2"
+    },
+    {
+      "path": "tmp9omindcr/engine/scoring.py",
+      "bytes": 2693,
+      "sha256": "288bd49f4d44893023a5b1667c92004ff99f7ada28bc336be45ba7a1093565dd"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/closeouts/2026-09-22.json",
+      "bytes": 583,
+      "sha256": "6ccf0fd9ca902379bc6f5a956a83bebac9744c33e66e202fa9d2672d5b7a3b8c"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/closeouts/acknowledgments/2026-09-22.json",
+      "bytes": 201,
+      "sha256": "2cb60849e7499571ea1938b4b1c9a0b8a04715a4aa04a2aa43c4930b11da1922"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/closeouts/public-acknowledgments/2026-09-22.json",
+      "bytes": 893,
+      "sha256": "b921448130f54871bfef77857a3c291175544181c248ca429d0172f72dc6c03e"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/weeks/2026-w2/scorecard.json",
+      "bytes": 26,
+      "sha256": "11baac9a5caddf36513c948c1864978874bc75b71626013546f4345d5bec58ed"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/weeks/2026-w2/season.json",
+      "bytes": 23,
+      "sha256": "1adf0e46ad7e7f2f2b98027906ae91acbe6cd193f7d4fea895979111c58d4c9c"
+    },
+    {
+      "path": "tmp9omindcr/outputs/cadence-v2/weeks/2026-w2/trend.json",
+      "bytes": 22,
+      "sha256": "5fae3dfca6c656c70e1a7347d64bee2981f6a49623f1a00a6f66acbc4c5bb8e5"
+    },
+    {
+      "path": "tmp9omindcr/outputs/projection-v3/pipeline-releases/intents/d8198dae0423671dd559c864842534ce3e98d833d7a8a94cf7e7270d66ce07c8.json",
+      "bytes": 654,
+      "sha256": "d8198dae0423671dd559c864842534ce3e98d833d7a8a94cf7e7270d66ce07c8"
+    },
+    {
+      "path": "tmp9omindcr/outputs/projection-v3/pipeline-releases/manifests/1d874750657d25d8683eef574f019701b0e3faf1e52ce7306ca0cb6556fffd15.json",
+      "bytes": 26,
+      "sha256": "1d874750657d25d8683eef574f019701b0e3faf1e52ce7306ca0cb6556fffd15"
+    },
+    {
+      "path": "tmp9omindcr/outputs/projection-v3/pipeline-releases/manifests/3c1aeacdccc2008b58ee65624785dfbadc1c878a3bd51f71274a28ae159b271b.json",
+      "bytes": 270,
+      "sha256": "3c1aeacdccc2008b58ee65624785dfbadc1c878a3bd51f71274a28ae159b271b"
+    },
+    {
+      "path": "tmp9omindcr/outputs/projection-v3/pipeline-releases/receipts/c54614229dbc84028e230167a9c7c784fd3bb54f35a072f24cb2a50f694d6ff0.json",
+      "bytes": 456,
+      "sha256": "c54614229dbc84028e230167a9c7c784fd3bb54f35a072f24cb2a50f694d6ff0"
+    },
+    {
+      "path": "tmp9omindcr/scripts/projection_calibration.py",
+      "bytes": 3401,
+      "sha256": "440266722826de4a23c3094db34466546ebb59d7f4c8d249840c3cb8ec1ba805"
+    },
+    {
+      "path": "tmp9omindcr/work/code.json",
+      "bytes": 19,
+      "sha256": "f1a8594e8976c89f1e5c028870c3d3764a7a5423473cd8635448d7f6d8cc6574"
+    },
+    {
+      "path": "tmp9omindcr/work/control.json",
+      "bytes": 385236,
+      "sha256": "c383aa2304461f047a8a773c442a38ac43757dd01a8791eb296343d7dcd4b21f"
+    },
+    {
+      "path": "tmp9omindcr/work/e-cal-lineage/executions/.worker.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "tmp9omindcr/work/e-cal-lineage/executions/81adfcd78a16a777277b2807dde250bb055018c09d9d9af284ee4990750d1ad9/attempts/001/start.json",
+      "bytes": 883,
+      "sha256": "a61c669c3a6f9f57f2f079b3eee42226b998fba7eafee009a6c4c57b31fd0cb2"
+    },
+    {
+      "path": "tmp9omindcr/work/e-cal-lineage/executions/81adfcd78a16a777277b2807dde250bb055018c09d9d9af284ee4990750d1ad9/request.json",
+      "bytes": 418734,
+      "sha256": "9c00b1b47b35eca3ab4d1ea008ccfcdcb025cfb3c60531a1384a2b55cdd6535b"
+    },
+    {
+      "path": "tmp9omindcr/work/in-season-learning-v1/parent-fit.json",
+      "bytes": 486,
+      "sha256": "a27cd46629b0fa3ca325fdb9cb476e99d8585358b2b4fb9c937541772795aec8"
+    },
+    {
+      "path": "tmp9omindcr/work/in-season-learning-v1/recorded-fit-55c8ef1914874970c34c32797154c106e1fb75f9107c44451c5fe97ffb426f9b.json",
+      "bytes": 861,
+      "sha256": "55c8ef1914874970c34c32797154c106e1fb75f9107c44451c5fe97ffb426f9b"
+    },
+    {
+      "path": "tmp9omindcr/work/inputs.json",
+      "bytes": 12538131,
+      "sha256": "582ec3708c2496b9f8fffb17a9ad22f957928b76e3c36093d6ab3e73e0ec1873"
+    },
+    {
+      "path": "tmp9omindcr/work/plan.json",
+      "bytes": 19,
+      "sha256": "f1a8594e8976c89f1e5c028870c3d3764a7a5423473cd8635448d7f6d8cc6574"
+    },
+    {
+      "path": "tmp9omindcr/work/projection-cutoff-pipeline-v1/fit-availability/efc98bbaeb909b862704e69fcfcd812eb5e0f76774fb82d8aefab7b47c9736a7.json",
+      "bytes": 389,
+      "sha256": "4bda2fe1448b77e2490d86568a23be6d077cf2c129f151749447b574c58f8cc2"
+    },
+    {
+      "path": "tmp9omindcr/work/projection-cutoff-pipeline-v1/shadow-fits/efc98bbaeb909b862704e69fcfcd812eb5e0f76774fb82d8aefab7b47c9736a7.json.gz",
+      "bytes": 430,
+      "sha256": "efc98bbaeb909b862704e69fcfcd812eb5e0f76774fb82d8aefab7b47c9736a7"
+    },
+    {
+      "path": "tmp9omindcr/work/projection-weekly-refit-v1/operations/2026-w2/request.json",
+      "bytes": 843,
+      "sha256": "ad0ccd20bbf2bffefb0468e3ef288a70ef8959b94bc93107223c0b2930ad9873"
+    },
+    {
+      "path": "tmp9omindcr/work/projection-weekly-refit-v1/operations/2026-w2/result.json",
+      "bytes": 925,
+      "sha256": "27bb4d34b8bab63ce0b00a99c8244dd6410384cdbae7a359f3a06973bca3828f"
+    },
+    {
+      "path": "tmp9omindcr/work/registration.json",
+      "bytes": 67674,
+      "sha256": "7acb1eeb8d1267287a53cf1a3b01d3d931a0e9274589884826905de7a2c2ebd3"
+    },
+    {
+      "path": "tmp9omindcr/work/schedule.json",
+      "bytes": 127947,
+      "sha256": "900e572086d9eefe2c7b2dcda67bdd41c9d90a7fcec2738c795a078fbab17d97"
+    },
+    {
+      "path": "tmp9omindcr/work/series-registry/catalog.json",
+      "bytes": 447,
+      "sha256": "97672f8bcec3fcc5c7f0f127dd817c574e1a471f97e6986009038ecc46c1d723"
+    },
+    {
+      "path": "tmp9omindcr/work/source.json",
+      "bytes": 19,
+      "sha256": "f1a8594e8976c89f1e5c028870c3d3764a7a5423473cd8635448d7f6d8cc6574"
+    }
+  ],
+  "native_result_exists": false,
+  "native_attempt_receipt_exists": false,
+  "retained_host_path": "/mnt/nfl-engine-profiles/calibration-scale-20260924/attempt1"
+}

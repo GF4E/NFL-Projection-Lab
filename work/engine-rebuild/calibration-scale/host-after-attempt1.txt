@@ -1,0 +1,22 @@
+Sep 24 01:51:34 nfl-engine-primary kernel: python invoked oom-killer: gfp_mask=0xcc0(GFP_KERNEL), order=0, oom_score_adj=0
+Sep 24 01:51:34 nfl-engine-primary kernel:  oom_kill_process+0x118/0x280
+Sep 24 01:51:34 nfl-engine-primary kernel: Memory cgroup stats for /system.slice/nfl-calibration-scale-20260924.service:
+Sep 24 01:51:34 nfl-engine-primary kernel: [  pid  ]   uid  tgid total_vm      rss rss_anon rss_file rss_shmem pgtables_bytes swapents oom_score_adj name
+Sep 24 01:51:34 nfl-engine-primary kernel: oom-kill:constraint=CONSTRAINT_MEMCG,nodemask=(null),cpuset=/,mems_allowed=0,oom_memcg=/system.slice/nfl-calibration-scale-20260924.service,task_memcg=/system.slice/nfl-calibration-scale-20260924.service,task=python,pid=3910199,uid=1000
+Sep 24 01:51:34 nfl-engine-primary kernel: Memory cgroup out of memory: Killed process 3910199 (python) total-vm:486688kB, anon-rss:260508kB, file-rss:2688kB, shmem-rss:0kB, UID:1000 pgtables:688kB oom_score_adj:0
+               total        used        free      shared  buff/cache   available
+Mem:       480497664   290086912    11239424     3268608   204070912   190410752
+Swap:     2147479552   135229440  2012250112
+active
+active
+active
+active
+active
+Result=success
+ActiveState=activating
+
+Result=success
+ActiveState=inactive
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       8.7G  5.2G  3.5G  60% /
+/dev/sda         20G   16G  3.2G  84% /mnt
