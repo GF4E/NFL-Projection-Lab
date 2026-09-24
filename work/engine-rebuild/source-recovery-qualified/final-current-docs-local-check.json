@@ -1,0 +1,68 @@
+{
+  "schema": "initial-release-preflight-v1",
+  "status": "BLOCKED",
+  "packet_ref": {
+    "path": "work/engine-rebuild/release-review/packets/d7e4d6ae770902a6d3b61ac76b318d77181dcbf2393c147774140d1254d0d260.json",
+    "sha256": "d7e4d6ae770902a6d3b61ac76b318d77181dcbf2393c147774140d1254d0d260"
+  },
+  "checks": [
+    {
+      "name": "RECOVERED_EXECUTABLE",
+      "status": "PASS",
+      "detail": "e14390e567d1b6357bdd88a2b8c8910becf4b0c6"
+    },
+    {
+      "name": "ISSUING_SOURCE",
+      "status": "PASS",
+      "detail": 50
+    },
+    {
+      "name": "FIT_AND_CALIBRATION",
+      "status": "PASS",
+      "detail": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+    },
+    {
+      "name": "TRAINING_HISTORY_BINDING",
+      "status": "PASS",
+      "detail": "84fcb3e32e175f38c6831c8faccbbdd1ed7bc93a9e3779045f00670d41f3bf9a"
+    },
+    {
+      "name": "RETAINED_PUBLIC_CLOSEOUT",
+      "status": "PASS",
+      "detail": "2026-09-23T17:50:24.820508+00:00"
+    },
+    {
+      "name": "CURRENT_RUNTIME",
+      "status": "NOT_CHECKED",
+      "detail": "Private accepted full-runtime manifest required; copying proof is not a fresh runtime check"
+    },
+    {
+      "name": "EXTERNAL_REVIEW_Claude",
+      "status": "NOT_RECORDED",
+      "detail": "Tier 2 review requested; no decision inferred. Not a new permission stop for authorized chronology work; actual method-promotion reviews remain mandatory",
+      "blocks_initial_chronology_work": false
+    },
+    {
+      "name": "EXTERNAL_REVIEW_Dr. M",
+      "status": "NOT_RECORDED",
+      "detail": "Tier 2 review requested; no decision inferred. Not a new permission stop for authorized chronology work; actual method-promotion reviews remain mandatory",
+      "blocks_initial_chronology_work": false
+    },
+    {
+      "name": "LIVE_TRANSITION",
+      "status": "NOT_INSTALLED",
+      "detail": {
+        "installed": {
+          "pipeline_manifest": false,
+          "weekly_refit": false
+        },
+        "remaining": "Enforced operator transition, qualified bootstrap and actual issuing/public provenance"
+      }
+    }
+  ],
+  "activation": false,
+  "control_authority_changed": false,
+  "provider_requests": 0,
+  "active_fit_pointer_checked": true,
+  "scope": "Read-only evidence binding; not an experiment, approval, runtime switch or production readiness certificate"
+}
