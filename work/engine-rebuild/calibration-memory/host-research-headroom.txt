@@ -1,0 +1,88 @@
+Thu Sep 24 03:05:37 UTC 2026
+MemTotal:         469236 kB
+MemFree:            8128 kB
+MemAvailable:     193792 kB
+Buffers:             600 kB
+Cached:           172208 kB
+SwapCached:         7632 kB
+Active:           213268 kB
+Inactive:         103772 kB
+Active(anon):     150472 kB
+Inactive(anon):     5852 kB
+Active(file):      62796 kB
+Inactive(file):    97920 kB
+Unevictable:       30396 kB
+Mlocked:           27324 kB
+SwapTotal:       2097148 kB
+SwapFree:        1963904 kB
+Zswap:                 0 kB
+Zswapped:              0 kB
+Dirty:               800 kB
+Writeback:             0 kB
+AnonPages:        173952 kB
+Mapped:            51064 kB
+Shmem:              3336 kB
+KReclaimable:      37292 kB
+Slab:              83032 kB
+SReclaimable:      37292 kB
+SUnreclaim:        45740 kB
+KernelStack:        2176 kB
+PageTables:         3560 kB
+SecPageTables:         0 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     2331764 kB
+Committed_AS:     955928 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:       19396 kB
+VmallocChunk:          0 kB
+Percpu:              896 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+FileHugePages:         0 kB
+FilePmdMapped:         0 kB
+Unaccepted:            0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+DirectMap4k:       69484 kB
+DirectMap2M:      454656 kB
+Thu 2026-09-24 03:05:43 UTC       5s Thu 2026-09-24 03:04:42 UTC       54s ago nfl-cutoff-state.timer         nfl-cutoff-state.service
+Thu 2026-09-24 03:06:12 UTC      34s Thu 2026-09-24 03:05:12 UTC       25s ago nfl-engine-watchdog.timer      nfl-engine-watchdog.service
+Thu 2026-09-24 04:00:00 UTC    54min Thu 2026-09-24 03:00:01 UTC      5min ago nfl-engine-daily.timer         nfl-engine-daily.service
+Tue 2026-09-29 13:00:00 UTC   5 days Tue 2026-09-22 13:00:00 UTC 1 day 14h ago nfl-learning.timer             nfl-learning.service
+-                                  - Thu 2026-09-24 03:05:25 UTC       12s ago nfl-engine-capture.timer       nfl-engine-capture.service
+  UNIT                        LOAD   ACTIVE SUB     DESCRIPTION
+  cron.service                loaded active running Regular background program processing daemon
+  dbus.service                loaded active running D-Bus System Message Bus
+  do-agent.service            loaded active running The DigitalOcean Monitoring Agent
+  droplet-agent.service       loaded active running The DigitalOcean Droplet Agent
+  fwupd.service               loaded active running Firmware update daemon
+  getty@tty1.service          loaded active running Getty on tty1
+  ModemManager.service        loaded active running Modem Manager
+  multipathd.service          loaded active running Device-Mapper Multipath Device Controller
+  polkit.service              loaded active running Authorization Manager
+  rsyslog.service             loaded active running System Logging Service
+  serial-getty@ttyS0.service  loaded active running Serial Getty on ttyS0
+  ssh.service                 loaded active running OpenBSD Secure Shell server
+  systemd-journald.service    loaded active running Journal Service
+  systemd-logind.service      loaded active running User Login Management
+  systemd-networkd.service    loaded active running Network Configuration
+  systemd-resolved.service    loaded active running Network Name Resolution
+  systemd-timesyncd.service   loaded active running Network Time Synchronization
+  systemd-udevd.service       loaded active running Rule-based Manager for Device Events and Files
+  udisks2.service             loaded active running Disk Manager
+  unattended-upgrades.service loaded active running Unattended Upgrades Shutdown
+  user@0.service              loaded active running User Manager for UID 0
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+21 loaded units listed.

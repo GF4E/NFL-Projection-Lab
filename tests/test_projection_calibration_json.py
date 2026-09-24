@@ -55,6 +55,27 @@ class CalibrationJSONTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Frozen'): codec.save(p, {'different': True})
             self.assertEqual(p.read_bytes(), q.read_bytes())
 
+    def test_multiple_files_share_strings_but_never_mutable_containers(self):
+        value = {'long-non-interned-key': [{'training_game_ids': ['long-game-identifier']*3}]}
+        with tempfile.TemporaryDirectory() as tmp:
+            p, q = Path(tmp)/'one.json', Path(tmp)/'two.json'
+            codec.save(p, value)
+            codec.save(q, value)
+            strings = {}
+            first = codec.load(p, strings=strings)
+            second = codec.load(q, strings=strings)
+            self.assertEqual(first, value)
+            self.assertEqual(second, value)
+            self.assertIs(next(iter(first)), next(iter(second)))
+            a = first['long-non-interned-key'][0]['training_game_ids']
+            b = second['long-non-interned-key'][0]['training_game_ids']
+            self.assertIsNot(a, b)
+            self.assertIs(a[0], b[0])
+            strings.clear()  # Pool is only an optimization, never authority.
+            self.assertEqual(codec.digest(first), codec.digest(second))
+            a[0] = 'changed'
+            self.assertEqual(b, ['long-game-identifier']*3)
+
     def test_before_commit_crash_and_disk_full_leave_no_record(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp)/'record.json'

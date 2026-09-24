@@ -46,9 +46,14 @@ def file_digest(path):
     return h.hexdigest()
 
 
-def load(path):
-    """Decode once, sharing repeated immutable strings within this read only."""
-    strings = {}
+def load(path, *, strings=None):
+    """Decode once; optionally share immutable strings across one result's files.
+
+    The caller owns the pool's lifetime. Mutable containers are always decoded
+    independently, and no strings are interned globally.
+    """
+    if strings is None:
+        strings = {}
     def shared(value):
         if isinstance(value, str):
             return strings.setdefault(value, value)
@@ -58,9 +63,8 @@ def load(path):
                     value[i] = strings.setdefault(element, element)
         return value
     def hook(mapping):
-        for key, value in mapping.items():
-            mapping[key] = shared(value)
-        return mapping
+        return {strings.setdefault(key, key): shared(value)
+                for key, value in mapping.items()}
     # Decode from a read-only file buffer, avoiding TextIO's simultaneous full
     # byte buffer and Unicode copy. The immutable result is hash-checked by the
     # caller before and after parsing; no mapping remains in returned objects.

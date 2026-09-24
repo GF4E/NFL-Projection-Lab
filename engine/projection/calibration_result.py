@@ -56,7 +56,11 @@ def encode(root, result_path, value):
 
 
 def load(root, result_path):
-    value = codec.load(result_path)
+    # Forty banks can repeat the same training-game identities many times.
+    # One bounded-lifetime pool retains each equal string once while preserving
+    # independent mutable containers and the complete logical result.
+    strings = {}
+    value = codec.load(result_path, strings=strings)
     if value.get('schema') == INLINE:
         return value
     if set(value) != {'schema', 'numerical_result', 'bank_refs'} or value['schema'] != SCHEMA:
@@ -69,7 +73,7 @@ def load(root, result_path):
         path = bank_path(root, result_path, key)
         if ref != reference(root, path):
             raise ValueError('Retained calibration bank reference differs')
-        bank = codec.load(path)
+        bank = codec.load(path, strings=strings)
         check_bank(key, bank)
         if ref != reference(root, path):
             raise ValueError('Retained calibration bank changed during read')
