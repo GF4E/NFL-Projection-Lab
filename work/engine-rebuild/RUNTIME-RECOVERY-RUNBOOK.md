@@ -4,14 +4,14 @@ Scope: restore a previously captured source/runtime pair in isolation and prove 
 
 ## Current retained recovery point
 
-Resolve `release-review/current-ref.json`; the current qualified packet is `10bc9361c1b5c16adc16777081c99ba487dfaa3694e5c7c29f09b498cf200344`. Its recovery acceptance and consumer receipts are hash-bound. Source, current issuing files and fit/calibration must match before use.
+Resolve `release-review/current-ref.json`; the current qualified packet is `d7e4d6ae770902a6d3b61ac76b318d77181dcbf2393c147774140d1254d0d260`. Its recovery acceptance and consumer receipts are hash-bound. Source, current issuing files and fit/calibration must match before use.
 
-- Restored source commit: `3990df9deb0a01eb26e99c7d5f65c7f1a84bfa86`; fifty-file issuing code commit `d2f7adaffe477d954c4fef78be18a1fab1d92829`.
-- Standalone Git bundle SHA-256: `f1abdec6da77ec9529849a048ac8b999b43dd03dd52ba5b8486e03a7c6dd3f01`, 552,283,490 bytes. Mac archive: `.cloud-private/source-diagnostics-recovery/source/<sha>.bundle`; host: `/mnt/nfl-engine-profiles/source-recovery-diagnostics/<sha>.bundle`.
-- Accepted complete source tree: `/mnt/nfl-engine-profiles/source-recovery-diagnostics/source`; receipt `source-recovery-diagnostics/source-restored.json`.
+- Restored source commit: `e14390e567d1b6357bdd88a2b8c8910becf4b0c6`; fifty-file issuing code commit `e2959f43db758e41ebed880501c87a6b149472d0`.
+- Standalone Git bundle SHA-256: `bce8ac8532fb7975585d61cd23308b2f1b40f22ea8aa0bc811c053dd7a8fa529`, 553,746,701 bytes. Mac archive: `.cloud-private/source-qualified-recovery/source/<sha>.bundle`; host: `/mnt/nfl-engine-profiles/source-recovery-qualified/<sha>.bundle`.
+- Accepted complete source tree: `/mnt/nfl-engine-profiles/source-recovery-qualified/source`; receipt `source-recovery-qualified/source-restored.json`.
 - Runtime manifest: `421443b220e5d492d8baf7c714c819ff44f4aa296d235f22aa9b7c1887454a01`; accepted private capture `/mnt/nfl-engine-profiles/runtime-restore-20260923/snapshot/intent.json`.
-- Accepted runtime: `/mnt/nfl-engine-profiles/runtime-restored-20260923-attempt2`. Both installed and restored trees reverified in `source-recovery-diagnostics/runtime-reverified.json`.
-- Consumer and initial operator execute from those read-only restored mounts, preserve all original locks/grades/fit pointer and verify native libraries outside the archived runtime. Six final actual-host technical checks passed; see SOURCE-DIAGNOSTICS-RECOVERY.md.
+- Accepted runtime: `/mnt/nfl-engine-profiles/runtime-restored-20260923-attempt2`. Both installed and restored trees reverified in `source-recovery-qualified/runtime-reverified.json`.
+- Consumer and initial operator execute from those read-only restored mounts, preserve all original locks/grades/fit pointer and verify native libraries outside the archived runtime. Six final actual-host technical checks passed; see SOURCE-QUALIFIED-RECOVERY.md.
 - Retired expanded trees: `/mnt/nfl-engine-profiles/source-restored-20260923` and `/mnt/nfl-engine-profiles/source-recovery-76f840b0/source`. Do not execute or assume these paths exist. Their original standalone archives and all receipts remain historical records. The newer source-recovery-50 tree remains preserved.
 - The incomplete first runtime attempt remains evidence, not an accepted restore. Never overwrite a partial attempt or reuse an immutable receipt name.
 

@@ -10,6 +10,16 @@ The replacement restoration passed under invocation c4933bc2ea8f49e98372778be150
 
 There is no live activation, statistical fit, gate/control change, paid provider request or new spending. Actual Friday September 25 06:00 Pacific state and issuing/public/control association still precede prospective enrollment or E-CAL. Calibration/conditional-mean semantics, E-VENUE, actual reviewer decisions, sustained headroom and the observed live cycle remain open.
 
+## Final host qualification
+
+Packet d7e4d6ae770902a6d3b61ac76b318d77181dcbf2393c147774140d1254d0d260 passes all six technical checks on actual host checkout 8854714e1885b35514194ac6dda2b29383d4afc7, observed 2026-09-24T01:29:18.314639+00:00. Issuing code remains e2959f43db758e41ebed880501c87a6b149472d0; complete restored source is e14390e567d1b6357bdd88a2b8c8910becf4b0c6. Final checks take 25.044 application / 25.447 service seconds under observed 570-second/4-GiB/one-CPU/private-network limits. All 53 originals/pointer remain unchanged. Root and artifact-volume free space at inspection: 3,707,195,392 / 3,397,308,416 bytes, a snapshot rather than sustained reserve qualification.
+
+The original final candidate a8c70111 contained an old 46-file initial-runbook snapshot inherited from its parent. The corrected final packet replaces only that document; its technical evidence is identical, proved in document-refresh.json. Both earlier packets remain preserved. No numerical rerun or source change was needed for the documentation correction. Current runbooks resolve the new packet and restored paths. External final-host evidence remains outside the immutable packet to avoid circular acceptance.
+
+The actual cutoff worker reports WAITING_FOR_CUTOFF, no prior cutoff, next 2026-09-25T13:00:00Z. This is a verified future dependency, not a completed live cycle. Keep the issuing source frozen; next use the real eligible cutoff and final-data availability, then the authorized initial handoff and actual issuing/public/control qualification. Do not create another recovery archive for documentation or ordinary output changes when the tested executable and dependencies remain identical.
+
+Release history: 15c60400b plan/harness; f927c4d73 verified restoration/consumer; e41a8bdb6 captured initial operator; 6bef326db corrected runbook snapshot. Each is on engine-v2 at the repository of record; no website deployment or numerical promotion occurs here.
+
 Least certain: whether future live conditions meet the full readiness requirements; simulated restoration alone cannot establish that.
 
 Confidence: medium in readiness — evidence depends on remaining recovery execution and live conditions that could reasonably differ. Lower to low if independent restoration or chronology checks disagree. The retired cache's identity and retained archives are separately supported by verified bytes.
