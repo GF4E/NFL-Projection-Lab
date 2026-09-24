@@ -1,0 +1,1930 @@
+{
+  "activates_method": false,
+  "all_capture_files_unchanged": true,
+  "capture_receipt_sha256": "3e8906cd1e4df5e2441cc5e5c15091b69f35c31b3a2330a984434c4d2da7f5e0",
+  "captured_at": "2026-09-22T18:15:51.315584+00:00",
+  "cards": [
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 23.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 4.543008715422508,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_ARI_LAC",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 21.744221295945433,
+          "home_points": 24.744221295945433,
+          "margin": 4.530503978779841,
+          "total": 46.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_ATL_PIT",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.744221295945433,
+          "home_points": 23.744221295945433,
+          "margin": 0.5305039787798408,
+          "total": 48.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_BAL_IND",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 25.744221295945433,
+          "home_points": 24.744221295945433,
+          "margin": 1.530503978779841,
+          "total": 50.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_BUF_HOU",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 25.744221295945433,
+          "home_points": 21.744221295945433,
+          "margin": -3.4694960212201593,
+          "total": 47.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_CHI_CAR",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 19.744221295945433,
+          "home_points": 26.744221295945433,
+          "margin": 8.53050397877984,
+          "total": 46.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_CLE_JAX",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 26.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 52.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_DAL_NYG",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_DEN_KC",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 23.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 45.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_GB_MIN",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 23.051534672224328,
+          "home_points": 20.051534672224328,
+          "margin": -1.4569912845774915,
+          "total": 43.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_MIA_LV",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 25.215611974232665,
+          "home_points": 26.21561197423266,
+          "margin": 1.0337248957938612,
+          "total": 51.44410761652141
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v1/residuals-da857eb7e84566068726e3efe0784813c1d9ca1cddc42f7f1bf1107859227036.json",
+        "sha256": "da857eb7e84566068726e3efe0784813c1d9ca1cddc42f7f1bf1107859227036"
+      },
+      "evidence": "RETROSPECTIVE",
+      "game_id": "2026_01_NE_SEA",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 20.744221295945433,
+          "home_points": 26.744221295945433,
+          "margin": 6.530503978779841,
+          "total": 47.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_NO_DET",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 21.744221295945433,
+          "home_points": 21.744221295945433,
+          "margin": 1.530503978779841,
+          "total": 43.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_NYJ_TEN",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.215611974232665,
+          "home_points": 26.21561197423266,
+          "margin": 2.033724895793861,
+          "total": 50.44410761652141
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v1/residuals-da857eb7e84566068726e3efe0784813c1d9ca1cddc42f7f1bf1107859227036.json",
+        "sha256": "da857eb7e84566068726e3efe0784813c1d9ca1cddc42f7f1bf1107859227036"
+      },
+      "evidence": "RETROSPECTIVE",
+      "game_id": "2026_01_SF_LA",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.744221295945433,
+          "home_points": 24.744221295945433,
+          "margin": 1.530503978779841,
+          "total": 49.488442591890866
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v2/residuals-f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9.json",
+        "sha256": "f9739742999323aacaad21a2a5993369fe872ff50467c73472a8ca2bbab553b9"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_TB_CIN",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 21.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 4.543008715422508,
+          "total": 45.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_01_WAS_PHI",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "week": 1
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 4.543008715422508,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_CAR_ATL",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 27.051534672224328,
+          "margin": 5.543008715422508,
+          "total": 51.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_CIN_HOU",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 5.543008715422508,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_CLE_TB",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 29.051534672224328,
+          "margin": 4.543008715422508,
+          "total": 54.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_DET_BUF",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 21.051534672224328,
+          "margin": -4.456991284577492,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_GB_NYJ",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 23.051534672224328,
+          "home_points": 26.051534672224328,
+          "margin": 4.543008715422508,
+          "total": 49.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_IND_KC",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 23.051534672224328,
+          "margin": -1.4569912845774915,
+          "total": 49.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_JAX_DEN",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 20.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 6.543008715422508,
+          "total": 45.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_LV_LAC",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 19.051534672224328,
+          "home_points": 27.051534672224328,
+          "margin": 9.54300871542251,
+          "total": 46.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_MIA_SF",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 0.5430087154225085,
+          "total": 52.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_MIN_CHI",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 28.051534672224328,
+          "margin": 7.543008715422508,
+          "total": 50.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_NO_BAL",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 21.051534672224328,
+          "home_points": 26.051534672224328,
+          "margin": 6.543008715422508,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_NYG_LA",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 28.051534672224328,
+          "home_points": 17.051534672224328,
+          "margin": -8.456991284577493,
+          "total": 45.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_PHI_TEN",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 3.5430087154225087,
+          "total": 49.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_PIT_NE",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 28.051534672224328,
+          "home_points": 20.051534672224328,
+          "margin": -7.456991284577492,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_SEA_ARI",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 49.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_02_WAS_DAL",
+      "resolution": "LEGACY_RECONSTRUCTED_NOT_ORIGINAL_REFERENCE",
+      "version": "projection-v2.hfa1.w2",
+      "week": 2
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 19.051534672224328,
+          "home_points": 28.051534672224328,
+          "margin": 10.54300871542251,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_ARI_SF",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 27.051534672224328,
+          "margin": 6.543008715422508,
+          "total": 49.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_ATL_GB",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 23.051534672224328,
+          "margin": -1.4569912845774915,
+          "total": 50.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_BAL_DAL",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 25.051534672224328,
+          "home_points": 22.051534672224328,
+          "margin": -1.4569912845774915,
+          "total": 46.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_CAR_CLE",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 23.051534672224328,
+          "margin": 0.5430087154225085,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_CIN_PIT",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 27.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": -1.4569912845774915,
+          "total": 51.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_HOU_IND",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 27.051534672224328,
+          "home_points": 20.051534672224328,
+          "margin": -5.456991284577492,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_KC_MIA",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 29.051534672224328,
+          "margin": 8.54300871542251,
+          "total": 51.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_LAC_BUF",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_LA_DEN",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 3.5430087154225087,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_LV_NO",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 27.051534672224328,
+          "home_points": 21.051534672224328,
+          "margin": -4.456991284577492,
+          "total": 48.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_MIN_TB",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 24.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 1.5430087154225087,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_NE_JAX",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 22.051534672224328,
+          "home_points": 28.051534672224328,
+          "margin": 7.543008715422508,
+          "total": 50.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_NYJ_DET",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 26.051534672224328,
+          "home_points": 25.051534672224328,
+          "margin": 0.5430087154225085,
+          "total": 51.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_PHI_CHI",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 29.051534672224328,
+          "home_points": 18.051534672224328,
+          "margin": -9.45699128457749,
+          "total": 47.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_SEA_WAS",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    },
+    {
+      "assessment": {
+        "activates_method": false,
+        "cdf_tolerance": 1e-14,
+        "distribution_means": {
+          "away_points": 19.051534672224328,
+          "home_points": 24.051534672224328,
+          "margin": 6.543008715422508,
+          "total": 43.10344827586207
+        },
+        "expected_score_contract_met": false,
+        "home_win_probability_field": "P(home strict win) + 0.5 P(tie)",
+        "joint_status": "NOT_ESTABLISHED",
+        "numeric_tolerance": 1e-10,
+        "schema": "expected-score-contract-assessment-v1",
+        "scope": "READ_ONLY_DIAGNOSTIC; not an E-CAL gate or release authorization",
+        "statistical_mean_accuracy": "NOT_ESTABLISHED_BY_ARITHMETIC",
+        "support_check_scope": "Nonnegative integer scores; not a football scoring-path model",
+        "violations": [
+          "JOINT_EVIDENCE_MISSING",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:margin",
+          "MARGINAL_MEAN_LINEAR_IDENTITY:total",
+          "NEGATIVE_SCORE_SUPPORT:away_points",
+          "NEGATIVE_SCORE_SUPPORT:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:margin",
+          "POINT_IS_NOT_DISTRIBUTION_MEAN:total"
+        ]
+      },
+      "calibration_ref": {
+        "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+        "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+      },
+      "evidence": "AS_ISSUED",
+      "game_id": "2026_03_TEN_NYG",
+      "resolution": "EXACT_REFERENCE",
+      "version": "projection-v2.hfa1.w3",
+      "week": 3
+    }
+  ],
+  "checker_sha256": "21ba19e714f6c8baeb993f2fcc039f011096e87d3d9f61863a78494b96ace40f",
+  "counts": {
+    "JOINT_EVIDENCE_MISSING": 48,
+    "MARGINAL_MEAN_LINEAR_IDENTITY:margin": 48,
+    "MARGINAL_MEAN_LINEAR_IDENTITY:total": 40,
+    "NEGATIVE_SCORE_SUPPORT:away_points": 45,
+    "NEGATIVE_SCORE_SUPPORT:home_points": 43,
+    "POINT_IS_NOT_DISTRIBUTION_MEAN:away_points": 48,
+    "POINT_IS_NOT_DISTRIBUTION_MEAN:home_points": 48,
+    "POINT_IS_NOT_DISTRIBUTION_MEAN:margin": 48,
+    "POINT_IS_NOT_DISTRIBUTION_MEAN:total": 48
+  },
+  "frozen_issuing_files_unchanged": 50,
+  "production_enforcement": "NOT_INSTALLED",
+  "scope": "READ_ONLY_ACCEPTANCE_QUALIFICATION; original captured forecasts unchanged; no experiment",
+  "script_sha256": "844126ed141ac8afb66afdab2ae5729b99193ed68e3f900c4cc6063673097107",
+  "strict_probabilities": "DERIVED_FROM_ORIGINAL_MARGIN_COUNTS",
+  "team_intervals": "DERIVED_FROM_ORIGINAL_TEAM_COUNTS; not separately stored in original forecasts"
+}

@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "<string>", line 10, in <module>
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/calibration_report.py", line 142, in publish
+    root=Path(root).resolve();saved=execution.read(root,key);r=saved['request']['registration']
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/calibration_execute.py", line 74, in read
+    request=read_envelope(folder/'request.json')
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/calibration_execute.py", line 40, in read_envelope
+    value=json.loads(Path(path).read_bytes())
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/.cloud-private/calibration-memory/shared-pool/tmp0k7nfgw7/work/e-cal-lineage/executions/c70c6d3f20a0d85eeff2162b2e0e1b75f29307ac353a4e1446a5fbbee4131269/request.json'
