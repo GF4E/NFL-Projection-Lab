@@ -118,7 +118,7 @@ class ExecutionTests(Base):
 
     def test_tampered_result_rejected_before_report_or_refit(self):
         self.execute();p=self.folder()/'attempts/001/result.json';value=json.loads(p.read_text())
-        value['pooled']['candidate']['team']['mae']=0.;value['sha256']=a.digest({k:v for k,v in value.items() if k!='sha256'})
+        value['numerical_result']['pooled']['candidate']['team']['mae']=0.
         p.write_text(json.dumps(value))
         with patch.object(evaluator,'run') as worker,self.assertRaisesRegex(ValueError,'durable result intent'):
             self.execute()
@@ -127,12 +127,12 @@ class ExecutionTests(Base):
 
     def test_result_changed_during_streamed_read_is_rejected(self):
         self.execute()
-        real=x.retained_json.load
-        def changed(path):
-            value=real(path)
+        real=x.retained_result.load
+        def changed(root,path):
+            value=real(root,path)
             path.write_bytes(path.read_bytes()+b' ')
             return value
-        with patch.object(x.retained_json,'load',side_effect=changed),self.assertRaisesRegex(ValueError,'changed during read'):
+        with patch.object(x.retained_result,'load',side_effect=changed),self.assertRaisesRegex(ValueError,'changed during read'):
             x.read(self.root,self.key)
 
     def test_full_disk_cannot_create_false_success(self):
@@ -239,12 +239,61 @@ class ExecutionTests(Base):
             return real(path,value,**kwargs)
         with patch.object(storage,'save',side_effect=crash),self.assertRaises(KeyboardInterrupt):self.execute()
         p=self.folder()/'attempts/001/result.json';v=json.loads(p.read_text())
-        v['pooled']['candidate']['team']['crps']=0
-        v['sha256']=a.digest({k:z for k,z in v.items() if k!='sha256'})
+        v['numerical_result']['pooled']['candidate']['team']['crps']=0
         p.write_text(json.dumps(v,sort_keys=True,separators=(',',':'))+'\n')
         with patch.object(evaluator,'run') as worker,self.assertRaisesRegex(ValueError,'durable result intent'):
             self.execute()
         worker.assert_not_called();self.assertFalse((p.parent/'receipt.json').exists())
+
+    def test_external_banks_reconstruct_the_exact_logical_result(self):
+        saved=self.execute();p=self.folder()/'attempts/001/result.json'
+        disk=json.loads(p.read_text());logical=saved['attempts'][0]['result']
+        self.assertEqual(disk['schema'],'calibration-result-storage-v1')
+        self.assertNotIn('banks',disk['numerical_result'])
+        self.assertEqual(set(disk['bank_refs']),set(logical['banks']))
+        self.assertEqual(x.retained_result.load(self.root,p),logical)
+        self.assertEqual(logical['sha256'],a.digest({k:v for k,v in logical.items() if k!='sha256'}))
+
+    def test_changed_or_missing_bank_fails_before_report_or_refit(self):
+        self.execute();p=self.folder()/'attempts/001/result.json'
+        disk=json.loads(p.read_text());ref=next(iter(disk['bank_refs'].values()))
+        bank=self.root/ref['path'];original=bank.read_bytes()
+        bank.write_bytes(original+b' ')
+        with patch.object(evaluator,'run') as worker,self.assertRaisesRegex(ValueError,'bank reference'):
+            self.execute()
+        worker.assert_not_called()
+        bank.unlink()
+        with self.assertRaises(FileNotFoundError):report.publish(self.root,self.key)
+
+    def test_bank_reference_cannot_escape_the_exact_content_address(self):
+        self.execute();p=self.folder()/'attempts/001/result.json'
+        disk=json.loads(p.read_text());key=next(iter(disk['bank_refs']))
+        disk['bank_refs'][key]['path']='../outside.json'
+        p.write_text(json.dumps(disk))
+        with self.assertRaisesRegex(ValueError,'bank reference'):
+            x.retained_result.load(self.root,p)
+
+    def test_legacy_inline_result_read_and_retry_preserve_its_bytes(self):
+        logical=self.execute()['attempts'][0]['result']
+        p=self.root/'work/legacy/attempts/001/result.json'
+        storage.save(p,logical,immutable=True);before=p.read_bytes()
+        self.assertEqual(x.retained_result.load(self.root,p),logical)
+        encoded=x.retained_result.encode(self.root,p,logical)
+        self.assertEqual(x.retained_json.save(p,encoded,immutable=True),'UNCHANGED')
+        self.assertEqual(p.read_bytes(),before)
+
+    def test_crash_after_banks_before_manifest_leaves_no_false_result(self):
+        real=x.retained_json.save
+        def crash(path,value,**kwargs):
+            if path.name=='result.json':raise KeyboardInterrupt
+            return real(path,value,**kwargs)
+        with patch.object(x.retained_json,'save',side_effect=crash),self.assertRaises(KeyboardInterrupt):
+            self.execute()
+        self.assertTrue(list((self.folder()/'banks').glob('*.json')))
+        with patch.object(evaluator,'run') as worker:
+            interrupted=self.execute();worker.assert_not_called()
+        self.assertEqual(interrupted['attempts'][0]['receipt']['state'],'INTERRUPTED')
+        self.assertIsNone(interrupted['attempts'][0]['result'])
 
     def test_killed_live_process_releases_lock_and_records_interruption(self):
         import os,select,subprocess,sys

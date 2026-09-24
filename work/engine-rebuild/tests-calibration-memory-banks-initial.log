@@ -1,0 +1,14 @@
+........................................................E........................................
+======================================================================
+ERROR: test_unsealed_result_must_match_prior_durable_intent (test_projection_calibration_execute.ExecutionTests.test_unsealed_result_must_match_prior_durable_intent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_calibration_execute.py", line 242, in test_unsealed_result_must_match_prior_durable_intent
+    v['pooled']['candidate']['team']['crps']=0
+    ~^^^^^^^^^^
+KeyError: 'pooled'
+
+----------------------------------------------------------------------
+Ran 97 tests in 5.576s
+
+FAILED (errors=1)

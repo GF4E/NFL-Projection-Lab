@@ -10,6 +10,7 @@ from pathlib import Path
 from engine.forecast_system.calendar import timestamp
 from .calibration_json import digest
 from . import calibration_json as retained_json
+from . import calibration_result as retained_result
 from . import calibration_admission as admission, calibration_evaluate as evaluator, storage
 
 BASE='work/e-cal-lineage/executions'
@@ -90,7 +91,7 @@ def read(root,key):
         if (path/'result.json').exists():
             if not intent or ref(root,path/'result.json')['sha256']!=intent['result_file_sha256']:
                 raise ValueError('Retained result differs from durable result intent')
-            record['result']=verify_result(retained_json.load(path/'result.json'),request)
+            record['result']=verify_result(retained_result.load(root,path/'result.json'),request)
             if ref(root,path/'result.json')['sha256']!=intent['result_file_sha256']:
                 raise ValueError('Retained result changed during read')
             if timestamp(record['result']['started_at'])<timestamp(start['started_at']):raise ValueError('Result predates attempt')
@@ -137,7 +138,9 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
             if receipt is None:
                 if previous['result'] is not None:
                     # Same payload completes any ambiguous result-directory sync.
-                    retained_json.save(path/'result.json',previous['result'],immutable=True)
+                    encoded=retained_result.encode(root,path/'result.json',previous['result'])
+                    retained_json.save(path/'result.json',encoded,immutable=True)
+                    del encoded
                     receipt={'schema':'calibration-attempt-receipt-v1','attempt':start['attempt'],
                         'start_sha256':digest(start),'state':'COMPUTED_NOT_RELEASED',
                         'result_ref':ref(root,path/'result.json'),'recorded_at':clock().isoformat(),
@@ -171,10 +174,12 @@ def run(root,registration_ref,*,clock=now_utc,retry=False):
             value=verify_result(evaluator.run(root,registration_ref,clock=clock),request)
             if timestamp(value['started_at'])<timestamp(start['started_at']):raise ValueError('Result predates attempt')
             admission.preflight(root,registration_ref,at=clock())
+            encoded=retained_result.encode(root,path/'result.json',value)
             intent={'schema':'calibration-result-intent-v1','attempt':number,'start_sha256':digest(start),
-                    'result_file_sha256':retained_json.digest(value,newline=True)}
+                    'result_file_sha256':retained_json.digest(encoded,newline=True)}
             storage.save(path/'result-intent.json',seal(intent),immutable=True)
-            retained_json.save(path/'result.json',value,immutable=True)
+            retained_json.save(path/'result.json',encoded,immutable=True)
+            del encoded
         except Exception as error:
             if (path/'result.json').exists():
                 # Do not turn an uncertain durable result into a false failure.
