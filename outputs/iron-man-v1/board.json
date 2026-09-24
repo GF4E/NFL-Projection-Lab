@@ -1455,7 +1455,28 @@
         "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
         "week": 3
       },
-      "locks": [],
+      "locks": [
+        {
+          "locked_at": "2026-09-24T23:00:06.226078+00:00",
+          "market": "totals",
+          "phase": "LATE",
+          "verdict": {
+            "reason": "TWO_INDEPENDENT_ENTRIES_REQUIRED",
+            "stake_dollars": 0.0,
+            "verdict": "MISSED"
+          }
+        },
+        {
+          "locked_at": "2026-09-24T23:00:06.226078+00:00",
+          "market": "spreads",
+          "phase": "LATE",
+          "verdict": {
+            "reason": "TWO_INDEPENDENT_ENTRIES_REQUIRED",
+            "stake_dollars": 0.0,
+            "verdict": "MISSED"
+          }
+        }
+      ],
       "no_autonomous_picks": true,
       "outside_view": "Market: GB by 5, total 44.",
       "sheet_status": "CURRENT",
