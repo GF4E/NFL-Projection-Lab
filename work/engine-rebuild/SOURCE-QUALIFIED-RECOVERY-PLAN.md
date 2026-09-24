@@ -1,0 +1,12 @@
+# Recovery qualification for the frozen diagnostic source
+
+Previous turn PROGRESS: source e2959f43d and its first-grade diagnostic publication are verified on the actual host. Preserve the full active rebuild goal; this recovery increment makes no numerical change or statistical claim. Freeze issuing source now through the initial handoff unless a concrete integrity failure requires correction.
+
+Pre-implementation gap sweep:
+- Tier 1: restore one standalone full Git bundle containing the final qualified diagnostic source, verify strict Git graph, every tracked byte/mode/link and syncfs, and retain identical archives on Mac and host. Reverify existing installed and restored runtimes instead of duplicating them. Execute restored forecast/grade/report parity, captured lifecycle and initial operator on that source, under existing isolation/resource/dispatch controls. The old 10bc9361 packet cannot admit changed source.
+- Tier 2 REVIEW REQUESTED: retire only the obsolete expanded `/mnt/nfl-engine-profiles/source-recovery-50/source` cache, after verifying its clean full tree, no mounted use, and exact standalone archive on both Mac and host. Preserve the archive, receipts, private removed-entry manifest and the newer diagnostics restore. This uses existing cache-only cleanup authority. Alternative: retain all expanded historical duplicates and purchase additional capacity. No unique artifact, runtime or production record is eligible.
+- Tier 1: retain the two-times-tracked-tree reserve for restore, 45-minute bounded restore phase, and 570-second/4-GiB/one-CPU consumer and operator runs. Record loaded limits and exact invocation terminal evidence. Observation timeouts do not restart work.
+- Tier 1: verify both report modules outside the numerical closure explicitly, using independent captured-report parity, in addition to all fifty issuing files. The source archive contains the entire tree. This adds proof, not a new forecast method or parameter.
+- Tier 1: bind a new immutable technical packet only after restored evidence exists, then verify it on the actual host. Synthetic calendar/final fixtures do not replace the first actual Friday September 25 cutoff. Actual reviewer decisions are not inferred.
+
+No Tier 3 choice, fitted candidate, gate or population changes. No provider requests or new spending. No further source edits are planned before handoff. Calibration/conditional-mean, E-VENUE, actual reviews, sustained storage and the live cycle remain outstanding.
