@@ -6,7 +6,7 @@ REVIEW REQUESTED — Tier 2: bucket standard errors cluster both teams by game; 
 REVIEW REQUESTED — Tier 2: conflicting latest edits at the same instant are excluded as ambiguous; alternative server sequence numbers are unavailable. No input-order tie-break or older-edit fallback.
 
 ## AS_ISSUED
-30 graded games; 16 pending; 0 final cards need immutable first grades.
+31 graded games; 15 pending; 0 final cards need immutable first grades.
 
 | week | scope | games | team_points_mae | margin_mae | total_mae | team_points_sigma | margin_sigma | total_sigma | margin_coverage_50 | margin_coverage_80 | total_coverage_50 | total_coverage_80 | home_bias | total_bias | projected_team_points_sd | actual_team_points_sd | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -14,40 +14,40 @@ REVIEW REQUESTED — Tier 2: conflicting latest edits at the same instant are ex
 | 1 | cumulative | 14 | 8.427663604561916 | 11.602647455761675 | 12.106675023932477 | 10.444043572793632 | 13.596230067716101 | 16.330911440921003 | 0.42857142857142855 | 0.7857142857142857 | 0.42857142857142855 | 0.9285714285714286 | 4.051335273532272 | 6.9079002454371485 | 1.9770869360742034 | 10.837623431022738 | -0.34965503170772794 | 13.234228182639809 | 7.657875544377649 | — |
 | 2 | week | 16 | 8.836376140888 | 12.389271501554912 | 12.345573656114901 | 10.405115207815165 | 15.045753478509855 | 14.818886963008383 | 0.3125 | 0.8125 | 0.5 | 0.8125 | -3.5919377860080917 | -5.987355464774765 | 2.8356919640354015 | 10.463431484818926 | -5.036551944388351 | -7.886186656752293 | 3.2217228221958947 | — |
 | 2 | cumulative | 30 | 8.645643623935827 | 12.022180280184735 | 12.234087627763103 | 10.83166533139144 | 14.192596439814318 | 16.61188614838374 | 0.36666666666666664 | 0.8 | 0.4666666666666667 | 0.8666666666666667 | -0.02507702488925515 | 0.030430533324127394 | 2.4826645165074996 | 11.052136545583492 | -2.2795537604585725 | -0.8460483769549261 | 4.330761002741333 | — |
-| 3 | week | 0 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| 3 | cumulative | 30 | 8.645643623935827 | 12.022180280184735 | 12.234087627763103 | 10.83166533139144 | 14.192596439814318 | 16.61188614838374 | 0.36666666666666664 | 0.8 | 0.4666666666666667 | 0.8666666666666667 | -0.02507702488925515 | 0.030430533324127394 | 2.4826645165074996 | 11.052136545583492 | -2.2795537604585725 | -0.8460483769549261 | 4.330761002741333 | — |
+| 3 | week | 1 | 12.77042384563604 | 25.54084769127208 | 1.8198178914354202 | 18.060106599751265 | — | — | 0 | 0 | 1 | 1 | -11.860514899918332 | 1.8198178914354202 | 2.2704238456360404 | 10.5 | — | -11.860514899918332 | — | — |
+| 3 | cumulative | 31 | 8.778701050442287 | 12.458266325703681 | 11.898143442720274 | 10.901864946123611 | 14.684207538650906 | 16.335836577486162 | 0.3548387096774194 | 0.7741935483870968 | 0.4838709677419355 | 0.8709677419354839 | -0.4068653434385802 | 0.08815270616642716 | 2.478285286606592 | 11.037868786433098 | -2.2795537604585725 | -1.9474950292512667 | 4.330761002741333 | — |
 
 ### Diagnostic buckets
 | Input | Band | Team observations | Games | Mean error | Game-cluster standard error | Flag |
 |---|---|---|---|---|---|---|
-| divisional | false | 22 | 11 | -2.2304125125342007 | 2.126124107840487 | False |
+| divisional | false | 24 | 12 | -1.968719057679875 | 1.958439829540515 | False |
 | divisional | true | 14 | 7 | -3.8060008513594403 | 2.7619940147408664 | False |
 | divisional | unavailable | 24 | 12 | 4.302750133104517 | 2.4691235025434124 | False |
-| dome | false | 24 | 12 | -2.450701101680881 | 2.2576232192929537 | False |
+| dome | false | 26 | 13 | -2.192192636496374 | 2.0927389992843595 | False |
 | dome | true | 4 | 2 | -3.48303619602864 | 2.042732096984593 | False |
 | dome | unavailable | 32 | 16 | 2.3019339757556105 | 2.1779490350524533 | False |
 | elo_difference | [-100,0) | 16 | 16 | 0.7094722635819355 | 2.821050467135796 | False |
-| elo_difference | [-inf,-100) | 10 | 10 | -1.1294282746263857 | 2.708717665008865 | False |
+| elo_difference | [-inf,-100) | 11 | 11 | 0.21691364046271744 | 2.7956681519509856 | False |
 | elo_difference | [0,100) | 16 | 16 | -0.076266469486993 | 3.639888605592531 | False |
-| elo_difference | [100,inf) | 10 | 10 | -1.2139839650978606 | 2.499370236639447 | False |
+| elo_difference | [100,inf) | 11 | 11 | -2.1818504137179033 | 2.4592327758543697 | False |
 | elo_difference | unavailable | 8 | 4 | 1.7769682114309013 | 2.6203427545956983 | False |
-| luck_index | [-0.5,0.5) | 35 | 18 | -3.019176102837467 | 1.688497989941061 | False |
+| luck_index | [-0.5,0.5) | 37 | 19 | -2.8067931272398896 | 1.608621654404074 | False |
 | luck_index | [-inf,-0.5) | 1 | 1 | 3.31807640452676 | None | False |
 | luck_index | unavailable | 24 | 12 | 4.302750133104517 | 2.4691235025434124 | False |
-| momentum | [-0.5,0.5) | 28 | 17 | -3.795116170715304 | 2.00716669152706 | False |
+| momentum | [-0.5,0.5) | 30 | 18 | -3.4814478296197695 | 1.8875396392558816 | False |
 | momentum | [-inf,-0.5) | 4 | 3 | 5.480202189429007 | 3.0796275200731764 | False |
 | momentum | [0.5,inf) | 4 | 4 | -4.502660793118025 | 3.530585337278912 | False |
 | momentum | unavailable | 24 | 12 | 4.302750133104517 | 2.4691235025434124 | False |
 | projected_margin | [-inf,3) | 34 | 17 | -0.22210950677884966 | 2.0083551434282505 | False |
-| projected_margin | [3,7) | 18 | 9 | 0.7357859847525783 | 3.491940127474287 | False |
+| projected_margin | [3,7) | 20 | 10 | 0.7531982808490912 | 3.1233347356867576 | False |
 | projected_margin | [7,14) | 8 | 4 | -0.5974385619177114 | 1.2412448278073338 | False |
-| rest_days | [-inf,6) | 2 | 1 | 9.764610222064288 | None | False |
+| rest_days | [-inf,6) | 4 | 2 | 5.337259583890998 | 4.42735063817329 | False |
 | rest_days | [14,inf) | 4 | 2 | -1.6388499395970806 | 0.8673393823004996 | False |
 | rest_days | [6,8) | 25 | 14 | -4.501548087224675 | 2.0862892265698374 | True |
 | rest_days | [8,14) | 5 | 4 | -0.5576411399815896 | 3.3810412265821257 | False |
 | rest_days | unavailable | 24 | 12 | 4.302750133104517 | 2.4691235025434124 | False |
 | team | ARI | 2 | 2 | -3.6327939899792927 | 7.964939290389035 | False |
-| team | ATL | 2 | 2 | -14.735627172099443 | 6.459512507927071 | True |
+| team | ATL | 3 | 3 | -5.263640517615046 | 10.179733057866462 | False |
 | team | BAL | 2 | 2 | 3.5284998777558254 | 13.299390244556802 | False |
 | team | BUF | 2 | 2 | 12.357056148439487 | 1.0702139176430698 | True |
 | team | CAR | 2 | 2 | 14.495563588442808 | 1.8892119035173263 | True |
@@ -57,7 +57,7 @@ REVIEW REQUESTED — Tier 2: conflicting latest edits at the same instant are ex
 | team | DAL | 2 | 2 | 4.402657534248641 | 9.263755053368564 | False |
 | team | DEN | 2 | 2 | -7.67749318728286 | 5.335110491586697 | False |
 | team | DET | 2 | 2 | 5.6366117948582275 | 0.4653385831877923 | True |
-| team | GB | 2 | 2 | -2.113583996626284 | 2.9573768460749417 | False |
+| team | GB | 3 | 3 | -5.3625609643903 | 3.670314783088927 | False |
 | team | HOU | 2 | 2 | -6.935293113280077 | 13.544695499038907 | False |
 | team | IND | 2 | 2 | 4.0553341366145474 | 4.114927281468077 | False |
 | team | JAX | 2 | 2 | -2.213456020836702 | 9.871331565214351 | False |
@@ -80,9 +80,9 @@ REVIEW REQUESTED — Tier 2: conflicting latest edits at the same instant are ex
 | team | WAS | 2 | 2 | -0.6448363331996116 | 2.7568805778574106 | False |
 | wind | [-inf,10) | 34 | 17 | -0.33378933721741894 | 2.3213517243568305 | False |
 | wind | [10,20) | 2 | 1 | -2.5061893218975797 | None | False |
-| wind | unavailable | 24 | 12 | 0.719755504537968 | 1.9858744788633016 | False |
+| wind | unavailable | 26 | 13 | 0.7343826923210249 | 1.8267973933782884 | False |
 
-Input coverage: {'divisional': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 36}, 'dome': {'INSUFFICIENT': 32, 'ORIGINAL_EXPLICIT_ROOF': 28}, 'elo_difference': {'INSUFFICIENT': 8, 'ORIGINAL_ACTIVE_CONTRIBUTION': 16, 'ORIGINAL_ACTIVE_FIELD': 36}, 'luck_index': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 36}, 'momentum': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 36}, 'rest_days': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 36}, 'wind': {'INSUFFICIENT': 24, 'ORIGINAL_PRELOCK_FORECAST': 36}}
+Input coverage: {'divisional': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 38}, 'dome': {'INSUFFICIENT': 32, 'ORIGINAL_EXPLICIT_ROOF': 30}, 'elo_difference': {'INSUFFICIENT': 8, 'ORIGINAL_ACTIVE_CONTRIBUTION': 16, 'ORIGINAL_ACTIVE_FIELD': 38}, 'luck_index': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 38}, 'momentum': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 38}, 'rest_days': {'INSUFFICIENT': 24, 'ORIGINAL_ACTIVE_FIELD': 38}, 'wind': {'INSUFFICIENT': 26, 'ORIGINAL_PRELOCK_FORECAST': 36}}
 Flags require two distinct games and qualified input; exploratory and not multiplicity-adjusted.
 
 ### Ten largest game errors
@@ -433,6 +433,122 @@ Flags require two distinct games and qualified input; exploratory and not multip
 | home | te_share | 0.21313864283232503 | 0.0 |
 | home | travel_miles | 0.0 | 0.0 |
 | home | turnover_margin | -0.011764705882352955 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_03_ATL_GB · projection-v2.hfa1.w3 · team MAE 12.77042384563604
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 20.559169320784378 | 20.559169320784378 |
+| away | baseline | 20.559169320784378 | -0.13302573791617386 |
+| away | elo | -90.59468989657171 | -0.8182733282267658 |
+| away | elo_difference | -115.04862009545286 | -1.169308445451373 |
+| away | calibration_intercept | 1.0 | 2.8811053994561875 |
+| away | career_fg_long | 0.6790123456790124 | 0.0 |
+| away | career_fg_medium | 0.7716049382716049 | 0.0 |
+| away | career_fg_short | 0.9386281588447654 | 0.0 |
+| away | close_win_rate | 0.3191489361702127 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | 1.8446732910524926 | 0.0 |
+| away | def_explosive | 0.08171856517590693 | 0.0 |
+| away | def_off_ppd | 2.2869393126397286 | 0.0 |
+| away | def_off_ypp | 5.149539599152714 | 0.0 |
+| away | def_pass_epa | 0.081704660943148 | 0.0 |
+| away | def_rush_epa | -0.06471169886426831 | 0.0 |
+| away | def_rush_success | 0.41391185610322684 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 10.352941176470589 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.46754074776975507 | 0.0 |
+| away | fumble_recovery | 0.42500000000000004 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.25585106382978723 | 0.0 |
+| away | momentum | -0.08520635683441007 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | -3.0466243472453964 | 0.0 |
+| away | off_explosive | 0.09475783682431135 | 0.0 |
+| away | off_off_ppd | 1.8176511565714788 | 0.0 |
+| away | off_off_ypp | 5.264028458423144 | 0.0 |
+| away | off_pass_epa | -0.11168345475783889 | 0.0 |
+| away | off_rush_epa | -0.07343553685170352 | 0.0 |
+| away | off_rush_success | 0.4190964668606836 | 0.0 |
+| away | opponent_drives | 9.682352941176472 | 0.0 |
+| away | plays_per_drive | 5.3386877828054295 | 0.0 |
+| away | pressure_allowed | 0.21108832523835222 | 0.0 |
+| away | pressure_generated | 0.2250993022007515 | 0.0 |
+| away | pythagorean | 0.2489316287035385 | 0.0 |
+| away | qb_backup | 1.0 | 0.0 |
+| away | qb_career_starts | 12.0 | 0.0 |
+| away | qb_cpoe | -2.5317432009615004 | 0.0 |
+| away | qb_epa | 0.04974422948594393 | 0.0 |
+| away | rb_share | 0.2944960080897946 | 0.0 |
+| away | redzone_td | 0.7253846153846154 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 4 | 0.0 |
+| away | return_points | 0.21176470588235294 | 0.0 |
+| away | schedule_strength | -0.02911128639925331 | 0.0 |
+| away | season_fg_long | 0.6119402985074627 | 0.0 |
+| away | season_fg_medium | 0.7356321839080461 | 0.0 |
+| away | season_fg_short | 0.8461538461538463 | 0.0 |
+| away | te_share | 0.2005807991668503 | 0.0 |
+| away | travel_miles | 767.7557416278746 | 0.0 |
+| away | turnover_margin | -0.8588235294117648 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 22.020771282113635 | 22.020771282113635 |
+| home | baseline | 22.020771282113635 | -0.43181470607174965 |
+| home | elo | 24.453930198881153 | 0.22114447896888698 |
+| home | elo_difference | 115.04862009545286 | 1.169308445451373 |
+| home | calibration_intercept | 1.0 | 2.8811053994561875 |
+| home | career_fg_long | 1.0 | 0.0 |
+| home | career_fg_medium | 1.0 | 0.0 |
+| home | career_fg_short | 1.0 | 0.0 |
+| home | close_win_rate | 0.6590909090909091 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 0.5216690779355664 | 0.0 |
+| home | def_explosive | 0.09518941160713469 | 0.0 |
+| home | def_off_ppd | 2.1517476080637956 | 0.0 |
+| home | def_off_ypp | 5.331018864557736 | 0.0 |
+| home | def_pass_epa | 0.020871057815777756 | 0.0 |
+| home | def_rush_epa | -0.04570901783432518 | 0.0 |
+| home | def_rush_success | 0.4123415481968436 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 9.682352941176472 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.24677499019694385 | 0.0 |
+| home | fumble_recovery | 0.4967105263157895 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | 0.15580143540669855 | 0.0 |
+| home | momentum | -0.40477338947163405 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | 0.6040773644689446 | 0.0 |
+| home | off_explosive | 0.10488439994427977 | 0.0 |
+| home | off_off_ppd | 2.24464830263417 | 0.0 |
+| home | off_off_ypp | 5.596375457924167 | 0.0 |
+| home | off_pass_epa | 0.10175332455459692 | 0.0 |
+| home | off_rush_epa | -0.10116977398280917 | 0.0 |
+| home | off_rush_success | 0.4161011655529936 | 0.0 |
+| home | opponent_drives | 10.352941176470589 | 0.0 |
+| home | plays_per_drive | 5.707137764196588 | 0.0 |
+| home | pressure_allowed | 0.2346550957994616 | 0.0 |
+| home | pressure_generated | 0.22887989203778675 | 0.0 |
+| home | pythagorean | 0.4562480682582978 | 0.0 |
+| home | qb_backup | 0.0 | 0.0 |
+| home | qb_career_starts | 54.0 | 0.0 |
+| home | qb_cpoe | -0.8990487162558285 | 0.0 |
+| home | qb_epa | 0.1584824152237223 | 0.0 |
+| home | rb_share | 0.12979401656344067 | 0.0 |
+| home | redzone_td | 0.5926829268292683 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 4 | 0.0 |
+| home | return_points | 0.0 | 0.0 |
+| home | schedule_strength | -0.06752924090047996 | 0.0 |
+| home | season_fg_long | 0.8125000000000001 | 0.0 |
+| home | season_fg_medium | 0.6842105263157895 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.19878341265108176 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | -0.611764705882353 | 0.0 |
 | home | wind | None | 0.0 |
 
 2026_02_PIT_NE · projection-v2.hfa1.w2 · team MAE 11.787724303329604
@@ -1131,122 +1247,6 @@ Flags require two distinct games and qualified input; exploratory and not multip
 | home | turnover_margin | 0.588235294117647 | 0.0 |
 | home | wind | None | 0.0 |
 
-2026_02_NYG_LA · projection-v2.hfa1.w2 · team MAE 8.539959784711996
-| Side | Input | Value | Contribution |
-|---|---|---|---|
-| away | football_baseline | 18.662415983622203 | 18.662415983622203 |
-| away | baseline | 18.662415983622203 | 0.24949380215798123 |
-| away | elo | -58.07669724794687 | -0.5328118102543637 |
-| away | elo_difference | -120.21100495396877 | -1.2113970565301262 |
-| away | calibration_intercept | 1.0 | 2.8980271587295334 |
-| away | career_fg_long | None | 0.0 |
-| away | career_fg_medium | None | 0.0 |
-| away | career_fg_short | None | 0.0 |
-| away | close_win_rate | 0.14285714285714285 | 0.0 |
-| away | continuity | None | 0.0 |
-| away | def_cpoe | -0.3505347006489221 | 0.0 |
-| away | def_explosive | 0.0925720587517305 | 0.0 |
-| away | def_off_ppd | 2.104851744625147 | 0.0 |
-| away | def_off_ypp | 5.4231567145117285 | 0.0 |
-| away | def_pass_epa | 0.02520143586316355 | 0.0 |
-| away | def_rush_epa | -0.008440261251025427 | 0.0 |
-| away | def_rush_success | 0.4267096626828006 | 0.0 |
-| away | divisional | 0.0 | 0.0 |
-| away | drives | 8.552941176470588 | 0.0 |
-| away | elo_qb_adjustment | None | 0.0 |
-| away | fg_share | 0.1788453322709378 | 0.0 |
-| away | fumble_recovery | 0.430365296803653 | 0.0 |
-| away | home_divisional | 0.0 | 0.0 |
-| away | home_nondivisional | 0.0 | 0.0 |
-| away | luck_index | -0.42677756033920417 | 0.0 |
-| away | momentum | 0.5154914888925397 | 0.0 |
-| away | neutral | 0.0 | 0.0 |
-| away | off_cpoe | 0.5415236987407338 | 0.0 |
-| away | off_explosive | 0.09232882651285913 | 0.0 |
-| away | off_off_ppd | 2.238215630071327 | 0.0 |
-| away | off_off_ypp | 5.37006467043055 | 0.0 |
-| away | off_pass_epa | 0.06581982269613498 | 0.0 |
-| away | off_rush_epa | 0.005577961855055911 | 0.0 |
-| away | off_rush_success | 0.43693500108575506 | 0.0 |
-| away | opponent_drives | 8.635294117647058 | 0.0 |
-| away | plays_per_drive | 6.800407435701554 | 0.0 |
-| away | pressure_allowed | 0.2488409090909091 | 0.0 |
-| away | pressure_generated | 0.18844611528822053 | 0.0 |
-| away | pythagorean | 0.4722500203786686 | 0.0 |
-| away | qb_backup | 0.0 | 0.0 |
-| away | qb_career_starts | 13.0 | 0.0 |
-| away | qb_cpoe | 1.7924135866419406 | 0.0 |
-| away | qb_epa | 0.15325235171416585 | 0.0 |
-| away | rb_share | 0.1920694328990915 | 0.0 |
-| away | redzone_td | 0.6094117647058823 | 0.0 |
-| away | referee | None | 0.0 |
-| away | rest_days | 8 | 0.0 |
-| away | return_points | 0.5647058823529412 | 0.0 |
-| away | schedule_strength | -0.23555869839242316 | 0.0 |
-| away | season_fg_long | 0.3333333333333333 | 0.0 |
-| away | season_fg_medium | 0.75 | 0.0 |
-| away | season_fg_short | 1.0 | 0.0 |
-| away | te_share | 0.2206606458663536 | 0.0 |
-| away | travel_miles | 2449.365264026628 | 0.0 |
-| away | turnover_margin | -0.1411764705882353 | 0.0 |
-| away | wind | None | 0.0 |
-| home | football_baseline | 20.406384792943744 | 20.406384792943744 |
-| home | baseline | 20.406384792943744 | -0.10048850961572146 |
-| home | elo | 62.1343077060219 | 0.5704880097135562 |
-| home | elo_difference | 120.21100495396877 | 1.2113970565301262 |
-| home | calibration_intercept | 1.0 | 2.8980271587295334 |
-| home | career_fg_long | 1.0 | 0.0 |
-| home | career_fg_medium | 0.9 | 0.0 |
-| home | career_fg_short | 1.0 | 0.0 |
-| home | close_win_rate | 0.4444444444444444 | 0.0 |
-| home | continuity | None | 0.0 |
-| home | def_cpoe | 1.5479316468134856 | 0.0 |
-| home | def_explosive | 0.09933596567763534 | 0.0 |
-| home | def_off_ppd | 2.3250081467848367 | 0.0 |
-| home | def_off_ypp | 5.530796190379297 | 0.0 |
-| home | def_pass_epa | 0.06286788575463685 | 0.0 |
-| home | def_rush_epa | 0.07762449988533156 | 0.0 |
-| home | def_rush_success | 0.4589222438537466 | 0.0 |
-| home | divisional | 0.0 | 0.0 |
-| home | drives | 8.635294117647058 | 0.0 |
-| home | elo_qb_adjustment | None | 0.0 |
-| home | fg_share | 0.09812772456980187 | 0.0 |
-| home | fumble_recovery | 0.6536796536796536 | 0.0 |
-| home | home_divisional | 0.0 | 0.0 |
-| home | home_nondivisional | 1.0 | 0.0 |
-| home | luck_index | 0.09812409812409806 | 0.0 |
-| home | momentum | -0.30130702435592244 | 0.0 |
-| home | neutral | 0.0 | 0.0 |
-| home | off_cpoe | 0.5808310066432584 | 0.0 |
-| home | off_explosive | 0.10883826126046818 | 0.0 |
-| home | off_off_ppd | 2.4239109699850974 | 0.0 |
-| home | off_off_ypp | 5.900492727691489 | 0.0 |
-| home | off_pass_epa | 0.08718737063508544 | 0.0 |
-| home | off_rush_epa | 0.01019720613172472 | 0.0 |
-| home | off_rush_success | 0.4722210783585987 | 0.0 |
-| home | opponent_drives | 8.552941176470588 | 0.0 |
-| home | plays_per_drive | 6.113476197005609 | 0.0 |
-| home | pressure_allowed | 0.19934662998624486 | 0.0 |
-| home | pressure_generated | 0.19448798553096205 | 0.0 |
-| home | pythagorean | 0.6010694671421659 | 0.0 |
-| home | qb_backup | 0.0 | 0.0 |
-| home | qb_career_starts | 253.0 | 0.0 |
-| home | qb_cpoe | -0.4235777250949178 | 0.0 |
-| home | qb_epa | 0.14426944866639824 | 0.0 |
-| home | rb_share | 0.11082592832553775 | 0.0 |
-| home | redzone_td | 0.6510364145658263 | 0.0 |
-| home | referee | None | 0.0 |
-| home | rest_days | 11 | 0.0 |
-| home | return_points | 0.2823529411764706 | 0.0 |
-| home | schedule_strength | 0.4879025104124235 | 0.0 |
-| home | season_fg_long | 0.5 | 0.0 |
-| home | season_fg_medium | 0.8 | 0.0 |
-| home | season_fg_short | 0.8 | 0.0 |
-| home | te_share | 0.24203473386765023 | 0.0 |
-| home | travel_miles | 0.0 | 0.0 |
-| home | turnover_margin | 0.3764705882352941 | 0.0 |
-| home | wind | None | 0.0 |
-
 Three-week team streaks: []
 
 ## RETROSPECTIVE
@@ -1302,19 +1302,21 @@ REVIEW REQUESTED (Tier 2): paired-game bootstrap ignores cross-game dependence; 
 
 | Evidence | Season | Week | Scope | Games | Team MAE | Team CRPS | Margin CRPS | Total CRPS | Team 50 hits/n | Team 80 hits/n | Brier |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| AS_ISSUED | 2026 | all | season | 30 | 8.6456 | 6.0696 | 8.2019 | 9.0349 | 28/60 | 47/60 | 0.2288 |
+| AS_ISSUED | 2026 | all | season | 31 | 8.7787 | 6.1429 | 8.5931 | 8.8492 | 28/62 | 48/62 | 0.2374 |
 | AS_ISSUED | 2026 | 1 | week | 14 | 8.4277 | 5.8295 | 7.7644 | 8.7781 | 12/28 | 23/28 | 0.2105 |
 | AS_ISSUED | 2026 | 1 | cumulative | 14 | 8.4277 | 5.8295 | 7.7644 | 8.7781 | 12/28 | 23/28 | 0.2105 |
 | AS_ISSUED | 2026 | 2 | week | 16 | 8.8364 | 6.2796 | 8.5846 | 9.2596 | 16/32 | 24/32 | 0.2448 |
 | AS_ISSUED | 2026 | 2 | cumulative | 30 | 8.6456 | 6.0696 | 8.2019 | 9.0349 | 28/60 | 47/60 | 0.2288 |
+| AS_ISSUED | 2026 | 3 | week | 1 | 12.7704 | 8.3437 | 20.3288 | 3.2784 | 0/2 | 1/2 | 0.4970 |
+| AS_ISSUED | 2026 | 3 | cumulative | 31 | 8.7787 | 6.1429 | 8.5931 | 8.8492 | 28/62 | 48/62 | 0.2374 |
 
-Pending games: 16. Missing immutable first grades: 2.
+Pending games: 15. Missing immutable first grades: 2.
 Complete counts, interval scores/widths, RMSE, bias, dispersion, PIT, reliability, paired intervals, lineage strata and original evidence hashes are in trend.json → forecast_diagnostics.
 
 - 2026_01_NE_SEA: needs Immutable original first-grade record.
 - 2026_01_SF_LA: needs Immutable original first-grade record.
 
-<details><summary>DIAGNOSTIC ONLY — CLOSE — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%) | AS_ISSUED / projection-v2.hfa1.w2: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%) | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%) | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%); spread coverage 15/15 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%); spread coverage 6/6. Source: nflverse spread_line / total_line. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
-<details><summary>DIAGNOSTIC ONLY — OPEN — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6; totals INSUFFICIENT (34.3% historical coverage)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6. Source: nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
+<details><summary>DIAGNOSTIC ONLY — CLOSE — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%) | AS_ISSUED / projection-v2.hfa1.w2: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%) | AS_ISSUED / projection-v2.hfa1.w3: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 1/1 (100.00%; 95% 20.65–100.00%) | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%) | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%); spread coverage 15/15 | AS_ISSUED / projection-v2.hfa1.w3 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 1/1 (100.00%; 95% 20.65–100.00%); spread coverage 1/1 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%); spread coverage 6/6. Source: nflverse spread_line / total_line. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
+<details><summary>DIAGNOSTIC ONLY — OPEN — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.hfa1.w3: ATS 1/1 (100.00%; 95% 20.65–100.00%); spread coverage 1/1 | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6; totals INSUFFICIENT (34.3% historical coverage)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.hfa1.w3 2026: ATS 1/1 (100.00%; 95% 20.65–100.00%); spread coverage 1/1 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6. Source: nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
 
 Confidence: near-total — reported errors and diagnostics are arithmetic on saved projections and grades. Move down to high if a source or lineage mismatch invalidates those rows.
